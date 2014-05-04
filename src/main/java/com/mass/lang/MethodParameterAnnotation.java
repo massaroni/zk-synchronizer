@@ -1,4 +1,4 @@
-package com.mass.util;
+package com.mass.lang;
 
 import java.lang.annotation.Annotation;
 

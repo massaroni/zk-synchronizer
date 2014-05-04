@@ -19,7 +19,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import com.mass.util.MethodParameterAnnotation;
+import com.mass.lang.MethodParameterAnnotation;
 import com.mass.util.ReflectionUtils;
 
 public class ReflectionUtilsTest {

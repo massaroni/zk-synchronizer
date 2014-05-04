@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mass.concurrent.sync.LockRegistry;
-import com.mass.util.MethodParameterAnnotation;
+import com.mass.lang.MethodParameterAnnotation;
 
 /**
  * Proxy method calls with a @Synchronized parameter. This wraps their method calls in a best-effort interprocess lock.
