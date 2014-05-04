@@ -12,6 +12,8 @@ Your use case:
 
 ## Installing
 
+**This is a beta release, and I'm definitely rolling out some small improvements and api-breaking changes, in the next couple days.**
+
 As of version 1.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
 
 ### Requirements
