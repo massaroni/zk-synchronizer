@@ -15,6 +15,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
 
 /**
@@ -49,6 +50,8 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
 
     private LockRegistryFactory registryFactory() {
         final SynchronizerScope scope = configuration.getScope();
+        final SynchronizerLockingPolicy defaultLockingPolicy = configuration.getDefaultLockingPolicy();
+        final String zkBasePath = configuration.getZkMutexBasePath();
 
         switch (scope) {
         case LOCAL_JVM:
@@ -57,7 +60,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
             final CuratorFramework zkClient = context.getBean(CuratorFramework.class);
             checkState(zkClient != null,
                     "No CuratorFramework in the application context, required by Synchronizer for zookeeper inter-process locking.");
-            return new InterProcessLockRegistryFactory(zkClient, configuration.getZkMutexBasePath());
+            return new InterProcessLockRegistryFactory(zkClient, defaultLockingPolicy, zkBasePath);
         default:
             throw new IllegalStateException("Unexpected SynchronizerScope: " + scope);
         }

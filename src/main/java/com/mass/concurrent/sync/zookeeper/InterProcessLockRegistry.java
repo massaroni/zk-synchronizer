@@ -7,6 +7,7 @@ import org.apache.curator.framework.CuratorFramework;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.LockRegistry;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.core.Word;
 
 /**
@@ -18,21 +19,34 @@ import com.mass.core.Word;
  * @param <K>
  */
 public class InterProcessLockRegistry<K> implements LockRegistry<K> {
-    private final BestEffortInterProcessReentrantLockRegistry locks;
+    private final InterProcessReentrantLockRegistry locks;
     private final InterProcessLockKeyFactory<K> keyFactory;
 
     public InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
-            final CuratorFramework zkClient, final InterProcessLockKeyFactory<K> keyFactory) {
-        locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, zkClient);
-        Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
-        this.keyFactory = keyFactory;
+            final SynchronizerLockingPolicy lockingPolicy, final CuratorFramework zkClient,
+            final InterProcessLockKeyFactory<K> keyFactory) {
+        this(rootZkPath, lockRegistryName, lockingPolicy, zkClient == null ? null : new InterProcessMutexFactory(
+                zkClient), keyFactory);
     }
 
     @VisibleForTesting
     InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
-            final InterProcessMutexFactory mutexFactory, final InterProcessLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockingPolicy lockingPolicy, final InterProcessMutexFactory mutexFactory,
+            final InterProcessLockKeyFactory<K> keyFactory) {
         Preconditions.checkArgument(mutexFactory != null);
-        locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, mutexFactory);
+        Preconditions.checkArgument(lockingPolicy != null, "Undefined locking policy.");
+
+        switch (lockingPolicy) {
+        case BEST_EFFORT:
+            locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, mutexFactory);
+            break;
+        case STRICT:
+            locks = new StrictInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, mutexFactory);
+            break;
+        default:
+            throw new IllegalArgumentException("Unexpected locking policy: " + lockingPolicy);
+        }
+
         Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
         this.keyFactory = keyFactory;
     }
