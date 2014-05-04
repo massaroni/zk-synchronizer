@@ -2,6 +2,7 @@ package com.mass.concurrent.sync.springaop;
 
 import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -27,6 +28,11 @@ import com.google.common.collect.ImmutableList;
 public class SpringIntegrationTest {
     @Autowired
     private SynchronizedAlarms springAlarms;
+
+    @Test
+    public void testSpringAlarmsServiceIsProxied() {
+        assertFalse(springAlarms.getClass() == SynchronizedAlarms.class);
+    }
 
     @Test
     public void testExampleSpringAutowiring() throws Exception {

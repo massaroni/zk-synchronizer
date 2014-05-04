@@ -10,8 +10,10 @@
     <context:annotation-config />
     <aop:aspectj-autoproxy />
 
+	<!-- this is the service I want to synchronize -->
     <bean class="com.mass.concurrent.sync.springaop.SpringIntegrationTest.SynchronizedAlarms" />
-    
+
+	<!-- custom, user-provided synchronizer configuration -->    
     <bean class="com.mass.concurrent.sync.springaop.InterProcessLockDefinition">
     	<constructor-arg name="name" value="callers" />
     	<constructor-arg name="zookeeperPath" value="/zkpath/mutexes" />
@@ -19,11 +21,12 @@
     		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
     	</constructor-arg>
     </bean>
-    
-    <bean class="com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice" />
-    
-    <!-- use registries local to this vm, for the sake of this integration test.
-         this is not the lock registry factory you want to use in your cluster, in production. -->
-    <bean class="com.mass.concurrent.sync.springaop.LocalLockRegistryFactory" />
-
+	<bean class="com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration" >
+		<constructor-arg name="scope" value="LOCAL_JVM" /> <!-- this says we should use local locks for everything -->
+	</bean>
+	<!-- end custom, user-provided synchronizer configuration -->
+	
+	<!-- boilerplate synchronizer configuration. this line injects synchronizer into your app context. -->
+    <bean class="com.mass.concurrent.sync.springaop.SynchronizerAdviceConfigurationBean" />
+        
 </beans>
