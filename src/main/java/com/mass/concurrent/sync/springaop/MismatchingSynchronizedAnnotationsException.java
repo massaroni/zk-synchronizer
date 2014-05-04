@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 public class MismatchingSynchronizedAnnotationsException extends IllegalStateException {
     private static final long serialVersionUID = 908013594818007477L;

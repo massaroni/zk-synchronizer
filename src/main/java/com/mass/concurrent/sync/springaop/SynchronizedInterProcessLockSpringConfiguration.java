@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.springframework.beans.factory.annotation.Autowired;

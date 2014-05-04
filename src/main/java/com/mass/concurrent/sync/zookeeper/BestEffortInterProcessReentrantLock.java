@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;

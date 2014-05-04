@@ -1,4 +1,4 @@
-package com.mass.core.concurrent;
+package com.mass.concurrent.sync;
 
 import java.util.concurrent.locks.ReentrantLock;
 

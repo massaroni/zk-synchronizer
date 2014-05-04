@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -15,11 +15,12 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
-import com.mass.core.concurrent.springaop.InterProcessLockDefinition;
-import com.mass.core.concurrent.springaop.InterProcessLockRegistry;
-import com.mass.core.concurrent.springaop.InterProcessSynchronizedAdvice;
-import com.mass.core.concurrent.zookeeper.InterProcessLockKey;
-import com.mass.core.concurrent.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.springaop.InterProcessLockDefinition;
+import com.mass.concurrent.sync.springaop.InterProcessLockRegistry;
+import com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice;
+import com.mass.concurrent.sync.springaop.LockRegistryFactory;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 
 /**
  * This is for a one-shot disposable use case in unit tests.

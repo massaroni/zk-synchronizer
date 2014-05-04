@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,8 +17,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.junit.Test;
 
-import com.mass.core.concurrent.zookeeper.BestEffortInterProcessReentrantLock;
-import com.mass.core.concurrent.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
+import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock;
+import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
 
 public class BestEffortInterProcessReentrantLockTest {
 

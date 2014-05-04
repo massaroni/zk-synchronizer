@@ -1,12 +1,12 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
-import com.mass.core.concurrent.springaop.MismatchingSynchronizedAnnotationsException;
-import com.mass.core.concurrent.springaop.Synchronized;
+import com.mass.concurrent.sync.springaop.MismatchingSynchronizedAnnotationsException;
+import com.mass.concurrent.sync.springaop.Synchronized;
 
 public class InterProcessSynchronizedAdviceTest {
     @Test

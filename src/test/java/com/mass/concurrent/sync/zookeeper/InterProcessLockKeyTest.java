@@ -1,8 +1,8 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import org.junit.Test;
 
-import com.mass.core.concurrent.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
 
 public class InterProcessLockKeyTest {
 

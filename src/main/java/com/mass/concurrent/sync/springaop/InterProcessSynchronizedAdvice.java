@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.mass.core.concurrent.LockRegistry;
+import com.mass.concurrent.sync.LockRegistry;
 import com.mass.util.MethodParameterAnnotation;
 
 /**
@@ -48,7 +48,7 @@ public class InterProcessSynchronizedAdvice {
         }
     }
 
-    @Around("execution(* *(.., @com.mass.core.concurrent.springaop.Synchronized (*), ..))")
+    @Around("execution(* *(.., @com.mass.concurrent.sync.springaop.Synchronized (*), ..))")
     public Object synchronizeMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
         Preconditions.checkState(!isEmpty(lockRegistries), "No interprocess lock registries available.");
 

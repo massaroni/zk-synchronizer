@@ -1,11 +1,11 @@
-package com.mass.core.concurrent.springaop;
+package com.mass.concurrent.sync.springaop;
 
 import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.base.Preconditions;
-import com.mass.core.concurrent.zookeeper.GenericInterProcessLockRegistry;
-import com.mass.core.concurrent.zookeeper.InterProcessLockKey;
-import com.mass.core.concurrent.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.GenericInterProcessLockRegistry;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 
 public class InterProcessLockRegistry<K> extends GenericInterProcessLockRegistry<K> {
     private final InterProcessLockKeyFactory<K> keyFactory;

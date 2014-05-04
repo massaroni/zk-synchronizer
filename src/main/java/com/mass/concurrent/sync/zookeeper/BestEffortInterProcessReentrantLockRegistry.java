@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -12,7 +12,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.mass.core.concurrent.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
+import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
 
 /**
  * This is designed so that zookeeper is not a single point of failure. If there's no zookeeper client available, then

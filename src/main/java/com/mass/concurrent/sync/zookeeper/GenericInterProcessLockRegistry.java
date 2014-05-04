@@ -1,10 +1,10 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.curator.framework.CuratorFramework;
 
-import com.mass.core.concurrent.LockRegistry;
+import com.mass.concurrent.sync.LockRegistry;
 
 public abstract class GenericInterProcessLockRegistry<K> implements LockRegistry<K> {
     private final BestEffortInterProcessReentrantLockRegistry locks;

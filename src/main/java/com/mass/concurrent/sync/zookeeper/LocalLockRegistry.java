@@ -1,4 +1,4 @@
-package com.mass.core.concurrent.zookeeper;
+package com.mass.concurrent.sync.zookeeper;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -7,7 +7,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.mass.core.concurrent.LockRegistry;
+import com.mass.concurrent.sync.LockRegistry;
 
 /**
  * This is a fake interprocess lock registry that does all locking in memory. This will protect a single JVM, but it's
