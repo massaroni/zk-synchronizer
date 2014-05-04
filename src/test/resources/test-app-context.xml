@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+
+    <context:annotation-config />
+    <aop:aspectj-autoproxy />
+
+    <bean class="com.mass.concurrent.sync.springaop.SpringIntegrationTest.SynchronizedAlarms" />
+    
+    <bean class="com.mass.concurrent.sync.springaop.InterProcessLockDefinition">
+    	<constructor-arg name="name" value="callers" />
+    	<constructor-arg name="zookeeperPath" value="/zkpath/mutexes" />
+    	<constructor-arg name="lockKeyFactory">
+    		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
+    	</constructor-arg>
+    </bean>
+    
+    <bean class="com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice" />
+    
+    <!-- use registries local to this vm, for the sake of this integration test.
+         this is not the lock registry factory you want to use in your cluster, in production. -->
+    <bean class="com.mass.concurrent.sync.springaop.LocalLockRegistryFactory" />
+
+</beans>
