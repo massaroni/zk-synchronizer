@@ -2,6 +2,7 @@ package com.mass.concurrent.sync.springaop;
 
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.LockRegistry;
+import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.zookeeper.LocalLockRegistry;
 
 /**

@@ -3,6 +3,7 @@ package com.mass.concurrent.sync.springaop;
 import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.base.Preconditions;
+import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 

@@ -1,4 +1,4 @@
-package com.mass.concurrent.sync.springaop;
+package com.mass.concurrent.sync.springaop.config;
 
 import org.apache.commons.lang.StringUtils;
 

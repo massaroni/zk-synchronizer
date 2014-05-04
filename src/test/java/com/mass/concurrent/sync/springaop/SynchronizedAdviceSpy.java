@@ -15,9 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
-import com.mass.concurrent.sync.springaop.InterProcessLockDefinition;
 import com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice;
 import com.mass.concurrent.sync.springaop.LockRegistryFactory;
+import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
