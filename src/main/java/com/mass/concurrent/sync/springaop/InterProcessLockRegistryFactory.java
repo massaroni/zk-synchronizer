@@ -4,6 +4,7 @@ import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 
 class InterProcessLockRegistryFactory implements LockRegistryFactory {
     private final CuratorFramework zkClient;

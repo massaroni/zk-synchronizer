@@ -16,11 +16,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
 import com.mass.concurrent.sync.springaop.InterProcessLockDefinition;
-import com.mass.concurrent.sync.springaop.InterProcessLockRegistry;
 import com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice;
 import com.mass.concurrent.sync.springaop.LockRegistryFactory;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 
 /**
  * This is for a one-shot disposable use case in unit tests.
