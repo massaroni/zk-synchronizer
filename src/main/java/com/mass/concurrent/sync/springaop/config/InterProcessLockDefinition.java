@@ -5,27 +5,32 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 
+/**
+ * This is a user-provided per-lock configuration bean that you need in your spring application context. The name of
+ * this definition corresponds to the lock name in the @Synchronized("myLockName") annotation.
+ * 
+ * @author kmassaroni
+ */
 public class InterProcessLockDefinition {
     private final String name;
-    private final String zookeeperPath;
     private final InterProcessLockKeyFactory<?> lockKeyFactory;
 
-    public InterProcessLockDefinition(final String name, final String zookeeperPath,
-            final InterProcessLockKeyFactory<?> lockKeyFactory) {
+    /**
+     * @param name
+     *            - corresponds to the name in the synchronized annotation: @Synchronized("myLockName")
+     * @param lockKeyFactory
+     *            - converts your proprietary lock-key model into a lock key that we can use with zookeeper. this is
+     *            required even if you're not using zookeeper.
+     */
+    public InterProcessLockDefinition(final String name, final InterProcessLockKeyFactory<?> lockKeyFactory) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
-        Preconditions.checkArgument(StringUtils.isNotBlank(zookeeperPath), "Undefined lock name.");
 
         this.name = name;
-        this.zookeeperPath = zookeeperPath;
         this.lockKeyFactory = lockKeyFactory;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getZookeeperPath() {
-        return zookeeperPath;
     }
 
     public InterProcessLockKeyFactory<?> getLockKeyFactory() {
@@ -34,7 +39,6 @@ public class InterProcessLockDefinition {
 
     @Override
     public String toString() {
-        return "InterProcessLockDefinition [name=" + name + ", zookeeperPath=" + zookeeperPath + ", lockKeyFactory="
-                + lockKeyFactory + "]";
+        return "InterProcessLockDefinition [name=" + name + ", lockKeyFactory=" + lockKeyFactory + "]";
     }
 }

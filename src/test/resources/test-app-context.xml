@@ -16,13 +16,13 @@
 	<!-- custom, user-provided synchronizer configuration -->    
     <bean class="com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition">
     	<constructor-arg name="name" value="callers" />
-    	<constructor-arg name="zookeeperPath" value="/zkpath/mutexes" />
     	<constructor-arg name="lockKeyFactory">
     		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
     	</constructor-arg>
     </bean>
 	<bean class="com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration" >
 		<constructor-arg name="scope" value="LOCAL_JVM" /> <!-- this says we should use local locks for everything -->
+		<constructor-arg name="zkMutexBasePath" value="/zkpath/mutexes" />
 	</bean>
 	<!-- end custom, user-provided synchronizer configuration -->
 	

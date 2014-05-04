@@ -92,21 +92,12 @@ public class InterProcessSynchronizedAdvice {
         Preconditions.checkArgument(locks != null, "Undefined lock definitions.");
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
-        final Map<String, InterProcessLockDefinition> zkPaths = Maps.newHashMap();
         final Map<String, LockRegistry<Object>> registries = Maps.newHashMap();
 
         for (final InterProcessLockDefinition lockDefinition : locks) {
             final String name = lockDefinition.getName();
             Preconditions.checkArgument(!registries.containsKey(name),
                     "%s is already registered as an interprocess lock registry.", name);
-
-            final String zkPath = lockDefinition.getZookeeperPath();
-            final InterProcessLockDefinition owner = zkPaths.get(zkPath);
-            Preconditions.checkArgument(owner == null,
-                    "Multiple interprocess locks registered for the same zookeeper path: %s %s", lockDefinition, owner);
-
-            zkPaths.put(zkPath, lockDefinition);
-
             final LockRegistry<Object> registry = factory.newLockRegistry(lockDefinition);
             registries.put(name, registry);
         }

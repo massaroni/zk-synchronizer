@@ -15,8 +15,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
-import com.mass.concurrent.sync.springaop.InterProcessSynchronizedAdvice;
-import com.mass.concurrent.sync.springaop.LockRegistryFactory;
 import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
@@ -32,7 +30,7 @@ public class SynchronizedAdviceSpy {
     private final InterProcessSynchronizedAdvice adviceSpy;
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
-        final InterProcessLockDefinition lockDefinition = new InterProcessLockDefinition(lockName, "/foo",
+        final InterProcessLockDefinition lockDefinition = new InterProcessLockDefinition(lockName,
                 new NoOpLockKeyFactory());
 
         mockLock = mock(ReentrantLock.class);

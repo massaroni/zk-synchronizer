@@ -57,7 +57,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
             final CuratorFramework zkClient = context.getBean(CuratorFramework.class);
             checkState(zkClient != null,
                     "No CuratorFramework in the application context, required by Synchronizer for zookeeper inter-process locking.");
-            return new InterProcessLockRegistryFactory(zkClient);
+            return new InterProcessLockRegistryFactory(zkClient, configuration.getZkMutexBasePath());
         default:
             throw new IllegalStateException("Unexpected SynchronizerScope: " + scope);
         }
