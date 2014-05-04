@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import com.mass.core.Preconditions;
-
 public class PreconditionsTest {
     @Test(expected = IllegalArgumentException.class)
     public void testCheckNotBlank_Empty() {
@@ -74,6 +72,20 @@ public class PreconditionsTest {
 
     public void testCheckNotBlank_Msg_Num() {
         Preconditions.checkNotBlank("0", "testing");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckNotEmpty_Null() {
+        Preconditions.checkNotEmpty(null, "error msg");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testCheckNotEmpty_Empty() {
+        Preconditions.checkNotEmpty("", "error msg");
+    }
+
+    public void testCheckNotEmpty_Blank() {
+        Preconditions.checkNotEmpty(" ", "error msg");
     }
 
 }

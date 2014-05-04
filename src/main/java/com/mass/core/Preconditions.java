@@ -2,8 +2,8 @@ package com.mass.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang.StringUtils.isBlank;
-import static org.apache.commons.lang.StringUtils.isEmpty;
 import static org.apache.commons.lang.StringUtils.isNotBlank;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
 
 import java.util.NoSuchElementException;
 
@@ -33,7 +33,7 @@ public final class Preconditions {
     }
 
     public static void checkNotEmpty(final String arg, final Object errorMessage) {
-        checkArgument(isEmpty(arg), errorMessage);
+        checkArgument(isNotEmpty(arg), errorMessage);
     }
 
     /**
