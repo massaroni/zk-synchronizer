@@ -1,0 +1,64 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+version = '0.1'
+group = 'com.massaroni'
+
+repositories { mavenCentral() }
+
+dependencies {
+	// curator
+	compile 'org.apache.curator:curator-client:2.2.0-incubating'
+	compile 'org.apache.curator:curator-framework:2.2.0-incubating'
+	compile 'org.apache.curator:curator-recipes:2.2.0-incubating'
+	// end curator
+
+	compile 'joda-time:joda-time:2.3'
+	compile 'org.springframework:spring-context:3.2.8.RELEASE'
+	compile 'org.springframework:spring-core:3.2.8.RELEASE'
+	compile 'org.springframework:spring-aspects:3.2.8.RELEASE'
+	compile 'org.springframework.security:spring-security-core:3.2.3.RELEASE'
+	compile 'cglib:cglib:2.2.2'
+	compile 'commons-lang:commons-lang:2.6'
+	compile 'commons-io:commons-io:2.4'
+	compile 'commons-collections:commons-collections:3.2.1'
+	compile 'org.apache.commons:commons-lang3:3.1'
+	compile 'com.google.guava:guava:14.0.1'
+
+	testCompile 'org.springframework:spring-test:3.1.0.RELEASE'
+	testCompile 'junit:junit:4.11'
+	testCompile 'org.mockito:mockito-all:1.9.5'
+	testCompile 'org.databene:contiperf:2.0.0'
+}
+
+//Allow the test scripts to inherit command line properties.
+//sudo gradle build --continue -DGRIDGAIN_HOME=/Users/dinkar_ganti/gridgain
+//needed for running gridgain tests.
+test {
+	systemProperties = System.properties
+	testReport = true;
+	testLogging {
+		showStandardStreams = true;
+		exceptionFormat "full" //default is short
+	}
+	// listen to standard out and standard error of the test JVM(s)
+	onOutput { descriptor, event ->
+		logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+	}
+	//systemProperties['user.dir'] = workingDir
+	jvmArgs '-XX:MaxPermSize=128m'
+}
+
+eclipse {
+	project {
+		natures 'org.eclipse.jdt.core.javanature'
+		buildCommand 'org.eclipse.jdt.core.javabuilder'
+	}
+	classpath {
+		downloadSources=true
+		defaultOutputDir = file('build/eclipse/bin')
+	}
+}
+
