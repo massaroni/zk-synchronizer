@@ -1,0 +1,12 @@
+.classpath
+.project
+.settings/
+bin/
+contiperf-report/
+/*.iml
+/.DS_Store
+/.gradle
+/.idea
+/build
+/bin
+/contiperf-report
