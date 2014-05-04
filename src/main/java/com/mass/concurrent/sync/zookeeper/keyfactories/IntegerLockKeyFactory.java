@@ -5,14 +5,14 @@ import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
 
 /**
- * Use longs as interprocess lock keys. The key will be the human readable long, so your zookeeper paths are easy to
- * read.
+ * Use integers as interprocess lock keys. The key will be the human readable integer, so your zookeeper paths are easy
+ * to read.
  * 
  * @author kmassaroni
  */
-public class LongInterProcessLockKeyFactory implements InterProcessLockKeyFactory<Long> {
+public class IntegerLockKeyFactory implements InterProcessLockKeyFactory<Integer> {
     @Override
-    public InterProcessLockKey toKey(final Long key) {
+    public InterProcessLockKey toKey(final Integer key) {
         Preconditions.checkArgument(key != null, "Undefined lock key.");
         return new InterProcessLockKey(key.toString());
     }
