@@ -9,10 +9,12 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
+import com.mass.core.Word;
 
 /**
  * This is designed so that zookeeper is not a single point of failure. If there's no zookeeper client available, then
@@ -25,7 +27,7 @@ import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock.In
 public class BestEffortInterProcessReentrantLockRegistry {
     private final Cache<InterProcessLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
     private final String rootZkPath;
-    private final CuratorFramework zkClient;
+    private final InterProcessMutexFactory mutexFactory;
 
     private final Log log = LogFactory.getLog(BestEffortInterProcessReentrantLockRegistry.class);
     private final InterProcessLockFailObserver observer = new InterProcessLockFailObserver() {
@@ -35,20 +37,26 @@ public class BestEffortInterProcessReentrantLockRegistry {
         }
     };
 
-    public BestEffortInterProcessReentrantLockRegistry(final String rootZkPath, final CuratorFramework zkClient) {
-        super();
-        this.rootZkPath = toZkRootPath(rootZkPath);
-        this.zkClient = zkClient;
+    public BestEffortInterProcessReentrantLockRegistry(final String rootZkPath, final Word lockRegistryName,
+            final CuratorFramework zkClient) {
+        this(rootZkPath, lockRegistryName, zkClient == null ? null : new InterProcessMutexFactory(zkClient));
     }
 
-    private static String toZkRootPath(final String path) {
+    @VisibleForTesting
+    BestEffortInterProcessReentrantLockRegistry(final String rootZkPath, final Word lockRegistryName,
+            final InterProcessMutexFactory mutexFactory) {
+        this.rootZkPath = toZkDirPath(rootZkPath, lockRegistryName);
+        this.mutexFactory = mutexFactory;
+    }
+
+    private static String toZkDirPath(final String path, final Word lockRegistryName) {
         com.mass.core.Preconditions.checkNotBlank(path, "Undefined dir path for zookeeper mutexes base dir.");
 
         if (path.endsWith("/")) {
             return path;
         }
 
-        return path + '/';
+        return path + '/' + lockRegistryName.getValue() + '/';
     }
 
     public ReentrantLock getLock(final InterProcessLockKey key) {
@@ -71,14 +79,14 @@ public class BestEffortInterProcessReentrantLockRegistry {
 
         @Override
         public ReentrantLock call() throws Exception {
-            final String path = rootZkPath + id.getValue();
-
-            if (zkClient == null) {
+            if (mutexFactory == null) {
                 return new ReentrantLock(true);
             }
 
-            final InterProcessMutex mutex = new InterProcessMutex(zkClient, path);
+            final String path = rootZkPath + id.getValue();
+            final InterProcessMutex mutex = mutexFactory.newMutex(path);
             final BestEffortInterProcessReentrantLock lock = new BestEffortInterProcessReentrantLock(mutex, observer);
+
             return lock;
         }
     }

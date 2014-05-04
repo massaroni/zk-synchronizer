@@ -4,8 +4,10 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.curator.framework.CuratorFramework;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.LockRegistry;
+import com.mass.core.Word;
 
 /**
  * Get best-effort reentrant locks backed by curator zookeeper mutexes, for synchronizing keys across the whole cluster
@@ -19,9 +21,18 @@ public class InterProcessLockRegistry<K> implements LockRegistry<K> {
     private final BestEffortInterProcessReentrantLockRegistry locks;
     private final InterProcessLockKeyFactory<K> keyFactory;
 
-    public InterProcessLockRegistry(final String rootZkPath, final CuratorFramework zkClient,
-            final InterProcessLockKeyFactory<K> keyFactory) {
-        locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, zkClient);
+    public InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
+            final CuratorFramework zkClient, final InterProcessLockKeyFactory<K> keyFactory) {
+        locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, zkClient);
+        Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
+        this.keyFactory = keyFactory;
+    }
+
+    @VisibleForTesting
+    InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
+            final InterProcessMutexFactory mutexFactory, final InterProcessLockKeyFactory<K> keyFactory) {
+        Preconditions.checkArgument(mutexFactory != null);
+        locks = new BestEffortInterProcessReentrantLockRegistry(rootZkPath, lockRegistryName, mutexFactory);
         Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
         this.keyFactory = keyFactory;
     }

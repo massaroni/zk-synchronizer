@@ -95,7 +95,7 @@ public class InterProcessSynchronizedAdvice {
         final Map<String, LockRegistry<Object>> registries = Maps.newHashMap();
 
         for (final InterProcessLockDefinition lockDefinition : locks) {
-            final String name = lockDefinition.getName();
+            final String name = lockDefinition.getName().getValue();
             Preconditions.checkArgument(!registries.containsKey(name),
                     "%s is already registered as an interprocess lock registry.", name);
             final LockRegistry<Object> registry = factory.newLockRegistry(lockDefinition);

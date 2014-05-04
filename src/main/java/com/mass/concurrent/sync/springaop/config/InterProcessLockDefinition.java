@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.core.Word;
 
 /**
  * This is a user-provided per-lock configuration bean that you need in your spring application context. The name of
@@ -12,7 +13,7 @@ import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
  * @author kmassaroni
  */
 public class InterProcessLockDefinition {
-    private final String name;
+    private final Word name;
     private final InterProcessLockKeyFactory<?> lockKeyFactory;
 
     /**
@@ -25,11 +26,11 @@ public class InterProcessLockDefinition {
     public InterProcessLockDefinition(final String name, final InterProcessLockKeyFactory<?> lockKeyFactory) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
 
-        this.name = name;
+        this.name = new Word(name);
         this.lockKeyFactory = lockKeyFactory;
     }
 
-    public String getName() {
+    public Word getName() {
         return name;
     }
 

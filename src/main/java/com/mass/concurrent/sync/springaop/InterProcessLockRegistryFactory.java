@@ -26,6 +26,6 @@ class InterProcessLockRegistryFactory implements LockRegistryFactory {
     public InterProcessLockRegistry<Object> newLockRegistry(final InterProcessLockDefinition definition) {
         Preconditions.checkArgument(definition != null, "Undefined interprocess lock registry definition.");
         final InterProcessLockKeyFactory keyFactory = definition.getLockKeyFactory();
-        return new InterProcessLockRegistry(zkBasePath, zkClient, keyFactory);
+        return new InterProcessLockRegistry(zkBasePath, definition.getName(), zkClient, keyFactory);
     }
 }

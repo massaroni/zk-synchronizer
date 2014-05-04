@@ -5,16 +5,13 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
-import com.mass.concurrent.sync.springaop.MismatchingSynchronizedAnnotationsException;
-import com.mass.concurrent.sync.springaop.Synchronized;
-
 public class InterProcessSynchronizedAdviceTest {
     @Test
     public void testAopProxy_InterfaceTarget_Proxied() throws Throwable {
         final TestService target = new TestService();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
-        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test lock registry", "abc");
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
 
         factory.addAspect(spy.getAdviceSpy());
         final TestServiceInterface proxy = factory.getProxy();
@@ -31,7 +28,7 @@ public class InterProcessSynchronizedAdviceTest {
         final TestService target = new TestService();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
-        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test lock registry", "abc");
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
 
         factory.addAspect(spy.getAdviceSpy());
         final TestServiceInterface proxy = factory.getProxy();
@@ -48,7 +45,7 @@ public class InterProcessSynchronizedAdviceTest {
         final UnAnnotatedTestService target = new UnAnnotatedTestService();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
-        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test lock registry", "abc");
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
 
         factory.addAspect(spy.getAdviceSpy());
         final TestServiceInterface proxy = factory.getProxy();
@@ -65,7 +62,7 @@ public class InterProcessSynchronizedAdviceTest {
         final AnnotatedTestSubclass target = new AnnotatedTestSubclass();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
-        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test lock registry", "abc");
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
 
         factory.addAspect(spy.getAdviceSpy());
         final UnannotatedTestServiceInterface proxy = factory.getProxy();
@@ -82,7 +79,7 @@ public class InterProcessSynchronizedAdviceTest {
         final MismatchingTestSubclass target = new MismatchingTestSubclass();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
-        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test lock registry", "abc");
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
 
         factory.addAspect(spy.getAdviceSpy());
         final MismatchingTestInterface proxy = factory.getProxy();
@@ -91,14 +88,14 @@ public class InterProcessSynchronizedAdviceTest {
     }
 
     public static interface TestServiceInterface {
-        public String concat(@Synchronized("test lock registry") final String arg1, final String arg2);
+        public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2);
 
         public String unsynchronizedConcat(final String arg1, final String arg2);
     }
 
     public static class TestService implements TestServiceInterface {
         @Override
-        public String concat(@Synchronized("test lock registry") final String arg1, final String arg2) {
+        public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2) {
             return arg1 + arg2;
         }
 
@@ -126,7 +123,7 @@ public class InterProcessSynchronizedAdviceTest {
 
     public static class AnnotatedTestSubclass implements UnannotatedTestServiceInterface {
         @Override
-        public String concat(@Synchronized("test lock registry") final String arg1, final String arg2) {
+        public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2) {
             return arg1 + arg2;
         }
     }
@@ -137,7 +134,7 @@ public class InterProcessSynchronizedAdviceTest {
 
     public static class MismatchingTestSubclass implements MismatchingTestInterface {
         @Override
-        public String concat(@Synchronized("test lock registry") final String arg1, final String arg2) {
+        public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2) {
             return arg1 + arg2;
         }
     }
