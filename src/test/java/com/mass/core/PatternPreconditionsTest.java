@@ -33,7 +33,7 @@ public class PatternPreconditionsTest {
 
     @Test
     public void testWordPrecondition_AllChars() {
-        final String arg = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890";
+        final String arg = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_1234567890-";
         WORD_PRECONDITION.checkArgument(arg);
         WORD_PRECONDITION.checkArgument(arg, "test");
         WORD_PRECONDITION.checkArgument(arg, "testing %s", 123);

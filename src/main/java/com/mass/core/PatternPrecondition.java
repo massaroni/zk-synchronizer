@@ -12,7 +12,10 @@ import com.google.common.base.Preconditions;
 public class PatternPrecondition {
     private final Pattern pattern;
 
-    public static final PatternPrecondition WORD_PRECONDITION = new PatternPrecondition("\\w+");
+    /**
+     * This concept of a "word" is url-safe, linux path safe, and zookeeper znode name safe.
+     */
+    public static final PatternPrecondition WORD_PRECONDITION = new PatternPrecondition("[\\w\\-]+");
 
     public PatternPrecondition(final Pattern pattern) {
         Preconditions.checkArgument(pattern != null, "Undefined precondition pattern.");
@@ -28,7 +31,7 @@ public class PatternPrecondition {
      *            - java regex pattern
      */
     public PatternPrecondition(final String regexPattern) {
-        this.pattern = Pattern.compile(regexPattern);
+        pattern = Pattern.compile(regexPattern);
     }
 
     public void checkArgument(final String arg, final String msg) {
