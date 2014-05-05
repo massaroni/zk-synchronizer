@@ -13,11 +13,12 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.mass.concurrent.sync.SynchronizerLockKey;
 import com.mass.concurrent.sync.zookeeper.BestEffortInterProcessReentrantLock.InterProcessLockFailObserver;
 import com.mass.core.Word;
 
 abstract class InterProcessReentrantLockRegistry {
-    private final Cache<InterProcessLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
+    private final Cache<SynchronizerLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
     private final String rootZkPath;
     private final InterProcessMutexFactory mutexFactory;
 
@@ -51,7 +52,7 @@ abstract class InterProcessReentrantLockRegistry {
         return path + '/' + lockRegistryName.getValue() + '/';
     }
 
-    public ReentrantLock getLock(final InterProcessLockKey key) {
+    public ReentrantLock getLock(final SynchronizerLockKey key) {
         Preconditions.checkArgument(key != null, "Undefined key.");
         final LockFactory factory = new LockFactory(key);
 
@@ -65,9 +66,9 @@ abstract class InterProcessReentrantLockRegistry {
     protected abstract ReentrantLock newLock(InterProcessMutex mutex, InterProcessLockFailObserver observer);
 
     private class LockFactory implements Callable<ReentrantLock> {
-        private final InterProcessLockKey id;
+        private final SynchronizerLockKey id;
 
-        public LockFactory(final InterProcessLockKey id) {
+        public LockFactory(final SynchronizerLockKey id) {
             this.id = id;
         }
 

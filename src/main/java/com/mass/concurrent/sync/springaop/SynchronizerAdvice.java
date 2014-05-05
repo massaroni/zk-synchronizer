@@ -13,13 +13,13 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.mass.concurrent.sync.LockRegistry;
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
+import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 import com.mass.lang.MethodParameterAnnotation;
 
 /**
@@ -28,19 +28,19 @@ import com.mass.lang.MethodParameterAnnotation;
  * 
  * @author kmassaroni
  */
-@Component
 @Aspect
 @Order(Integer.MIN_VALUE)
-public class InterProcessSynchronizedAdvice {
-    private static final Log log = LogFactory.getLog(InterProcessSynchronizedAdvice.class);
+public class SynchronizerAdvice {
+    private static final Log log = LogFactory.getLog(SynchronizerAdvice.class);
 
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
 
     @Autowired
-    public InterProcessSynchronizedAdvice(final InterProcessLockDefinition[] locks, final LockRegistryFactory factory) {
+    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks,
+            final LockRegistryFactory factory) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
-        log.info("new InterProcessSynchronizedAdvice");
+        log.info("new SynchronizerAdvice");
 
         if (locks == null) {
             lockRegistries = null;
@@ -87,14 +87,14 @@ public class InterProcessSynchronizedAdvice {
         }
     }
 
-    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(final InterProcessLockDefinition[] locks,
-            final LockRegistryFactory factory) {
+    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(
+            final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         Preconditions.checkArgument(locks != null, "Undefined lock definitions.");
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         final Map<String, LockRegistry<Object>> registries = Maps.newHashMap();
 
-        for (final InterProcessLockDefinition lockDefinition : locks) {
+        for (final SynchronizerLockRegistryConfiguration lockDefinition : locks) {
             final String name = lockDefinition.getName().getValue();
             Preconditions.checkArgument(!registries.containsKey(name),
                     "%s is already registered as an interprocess lock registry.", name);

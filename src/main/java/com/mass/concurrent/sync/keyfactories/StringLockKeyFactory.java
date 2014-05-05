@@ -1,8 +1,8 @@
-package com.mass.concurrent.sync.zookeeper.keyfactories;
+package com.mass.concurrent.sync.keyfactories;
 
 import com.mass.codec.Base64;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.Preconditions;
 
 /**
@@ -11,11 +11,11 @@ import com.mass.core.Preconditions;
  * 
  * @author kmassaroni
  */
-public class StringLockKeyFactory implements InterProcessLockKeyFactory<String> {
+public class StringLockKeyFactory implements SynchronizerLockKeyFactory<String> {
     @Override
-    public InterProcessLockKey toKey(final String key) {
+    public SynchronizerLockKey toKey(final String key) {
         Preconditions.checkNotEmpty(key, "Empty interprocess lock key.");
         final String zkSafe = Base64.encodeURLSafe(key);
-        return new InterProcessLockKey(zkSafe);
+        return new SynchronizerLockKey(zkSafe);
     }
 }

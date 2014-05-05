@@ -6,7 +6,9 @@ import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.LockRegistry;
+import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.core.Word;
 
@@ -18,13 +20,13 @@ import com.mass.core.Word;
  * @author kmassaroni
  * @param <K>
  */
-public class InterProcessLockRegistry<K> implements LockRegistry<K> {
+class InterProcessLockRegistry<K> implements LockRegistry<K> {
     private final InterProcessReentrantLockRegistry locks;
-    private final InterProcessLockKeyFactory<K> keyFactory;
+    private final SynchronizerLockKeyFactory<K> keyFactory;
 
     public InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final CuratorFramework zkClient,
-            final InterProcessLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory) {
         this(rootZkPath, lockRegistryName, lockingPolicy, zkClient == null ? null : new InterProcessMutexFactory(
                 zkClient), keyFactory);
     }
@@ -32,7 +34,7 @@ public class InterProcessLockRegistry<K> implements LockRegistry<K> {
     @VisibleForTesting
     InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final InterProcessMutexFactory mutexFactory,
-            final InterProcessLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory) {
         Preconditions.checkArgument(mutexFactory != null);
         Preconditions.checkArgument(lockingPolicy != null, "Undefined locking policy.");
 
@@ -53,7 +55,7 @@ public class InterProcessLockRegistry<K> implements LockRegistry<K> {
 
     @Override
     public ReentrantLock getLock(final K key) {
-        final InterProcessLockKey lockKey = keyFactory.toKey(key);
+        final SynchronizerLockKey lockKey = keyFactory.toKey(key);
         Preconditions.checkArgument(lockKey != null, "Null lock key.");
         return locks.getLock(lockKey);
     }

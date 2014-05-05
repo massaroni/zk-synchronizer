@@ -10,7 +10,7 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.mass.concurrent.sync.zookeeper.keyfactories.IntegerLockKeyFactory;
+import com.mass.concurrent.sync.keyfactories.IntegerLockKeyFactory;
 
 public class InterProcessLockRegistryTest {
     @Test

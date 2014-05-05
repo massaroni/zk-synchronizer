@@ -15,7 +15,7 @@ import com.google.common.base.Preconditions;
  * 
  * @author kmassaroni
  */
-public class StrictInterProcessReentrantLock extends ReentrantLock {
+class StrictInterProcessReentrantLock extends ReentrantLock {
     private static final long serialVersionUID = 5812223349797413401L;
 
     private final InterProcessMutex mutex;

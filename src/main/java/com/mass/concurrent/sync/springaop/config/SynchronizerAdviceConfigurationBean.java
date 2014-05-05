@@ -1,4 +1,4 @@
-package com.mass.concurrent.sync.springaop;
+package com.mass.concurrent.sync.springaop.config;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -9,14 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
-import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
-import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
-import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
+import com.mass.concurrent.sync.springaop.SynchronizerAdvice;
+import com.mass.concurrent.sync.zookeeper.LockRegistries;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 
 /**
  * This bean factory makes it easier to configure a Synchronizer spring application context, because it conditionally
@@ -25,6 +25,7 @@ import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
  * 
  * @author kmassaroni
  */
+@Configuration
 public class SynchronizerAdviceConfigurationBean implements ApplicationContextAware {
     private ApplicationContext context;
 
@@ -32,21 +33,19 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     private SynchronizerConfiguration configuration;
 
     @Autowired
-    private InterProcessLockDefinition[] lockDefinitions;
+    private SynchronizerLockRegistryConfiguration[] lockDefinitions;
 
-    private final Supplier<InterProcessSynchronizedAdvice> adviceSupplier = Suppliers
-            .memoize(new Supplier<InterProcessSynchronizedAdvice>() {
-                @Override
-                public InterProcessSynchronizedAdvice get() {
-                    checkArgument(configuration != null, "Can't build advice: Undefined synchronizer configuration.");
-                    checkArgument(context != null, "Can't build advice: Undefined application context.");
+    private final Supplier<SynchronizerAdvice> adviceSupplier = Suppliers.memoize(new Supplier<SynchronizerAdvice>() {
+        @Override
+        public SynchronizerAdvice get() {
+            checkArgument(configuration != null, "Can't build advice: Undefined synchronizer configuration.");
+            checkArgument(context != null, "Can't build advice: Undefined application context.");
 
-                    final LockRegistryFactory factory = registryFactory();
-                    final InterProcessSynchronizedAdvice advice = new InterProcessSynchronizedAdvice(lockDefinitions,
-                            factory);
-                    return advice;
-                }
-            });
+            final LockRegistryFactory factory = registryFactory();
+            final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions, factory);
+            return advice;
+        }
+    });
 
     private LockRegistryFactory registryFactory() {
         final SynchronizerScope scope = configuration.getScope();
@@ -55,12 +54,12 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
 
         switch (scope) {
         case LOCAL_JVM:
-            return new LocalLockRegistryFactory();
+            return LockRegistries.newLocalLockRegistryFactory();
         case ZOOKEEPER:
             final CuratorFramework zkClient = context.getBean(CuratorFramework.class);
             checkState(zkClient != null,
                     "No CuratorFramework in the application context, required by Synchronizer for zookeeper inter-process locking.");
-            return new InterProcessLockRegistryFactory(zkClient, defaultLockingPolicy, zkBasePath);
+            return LockRegistries.newInterProcessLockRegistryFactory(zkClient, defaultLockingPolicy, zkBasePath);
         default:
             throw new IllegalStateException("Unexpected SynchronizerScope: " + scope);
         }
@@ -73,7 +72,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     }
 
     @Bean
-    public InterProcessSynchronizedAdvice synchronizer() throws Exception {
+    public SynchronizerAdvice synchronizer() throws Exception {
         return adviceSupplier.get();
     }
 

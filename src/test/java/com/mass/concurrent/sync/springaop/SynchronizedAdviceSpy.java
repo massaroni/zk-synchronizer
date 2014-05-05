@@ -15,10 +15,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
+import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 
 /**
  * This is for a one-shot disposable use case in unit tests.
@@ -27,11 +28,11 @@ import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
  */
 public class SynchronizedAdviceSpy {
     private final ReentrantLock mockLock;
-    private final InterProcessSynchronizedAdvice adviceSpy;
+    private final SynchronizerAdvice adviceSpy;
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
-        final InterProcessLockDefinition lockDefinition = new InterProcessLockDefinition(lockName,
-                new NoOpLockKeyFactory());
+        final SynchronizerLockRegistryConfiguration lockDefinition = new SynchronizerLockRegistryConfiguration(
+                lockName, new NoOpLockKeyFactory());
 
         mockLock = mock(ReentrantLock.class);
         try {
@@ -41,18 +42,18 @@ public class SynchronizedAdviceSpy {
         }
 
         @SuppressWarnings("unchecked")
-        final InterProcessLockRegistry<Object> mockLockRegistry = mock(InterProcessLockRegistry.class);
+        final LockRegistry<Object> mockLockRegistry = mock(LockRegistry.class);
         when(mockLockRegistry.getLock(eq(expectedLockKey))).thenReturn(mockLock);
 
         final LockRegistryFactory mockRegistryFactory = mock(LockRegistryFactory.class);
         when(mockRegistryFactory.newLockRegistry(eq(lockDefinition))).thenReturn(mockLockRegistry);
 
-        final InterProcessLockDefinition[] lockDefinitions = { lockDefinition };
+        final SynchronizerLockRegistryConfiguration[] lockDefinitions = { lockDefinition };
 
-        adviceSpy = Mockito.spy(new InterProcessSynchronizedAdvice(lockDefinitions, mockRegistryFactory));
+        adviceSpy = Mockito.spy(new SynchronizerAdvice(lockDefinitions, mockRegistryFactory));
     }
 
-    public InterProcessSynchronizedAdvice getAdviceSpy() {
+    public SynchronizerAdvice getAdviceSpy() {
         return adviceSpy;
     }
 
@@ -68,9 +69,9 @@ public class SynchronizedAdviceSpy {
         verify(mockLock, never()).unlock();
     }
 
-    private static class NoOpLockKeyFactory implements InterProcessLockKeyFactory<Object> {
+    private static class NoOpLockKeyFactory implements SynchronizerLockKeyFactory<Object> {
         @Override
-        public InterProcessLockKey toKey(final Object key) {
+        public SynchronizerLockKey toKey(final Object key) {
             return null;
         }
     }
