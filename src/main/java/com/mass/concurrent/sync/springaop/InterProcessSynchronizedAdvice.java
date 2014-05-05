@@ -13,7 +13,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
@@ -29,7 +28,6 @@ import com.mass.lang.MethodParameterAnnotation;
  * 
  * @author kmassaroni
  */
-@Component
 @Aspect
 @Order(Integer.MIN_VALUE)
 public class InterProcessSynchronizedAdvice {
@@ -38,7 +36,8 @@ public class InterProcessSynchronizedAdvice {
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
 
     @Autowired
-    public InterProcessSynchronizedAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
+    public InterProcessSynchronizedAdvice(final SynchronizerLockRegistryConfiguration[] locks,
+            final LockRegistryFactory factory) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         log.info("new InterProcessSynchronizedAdvice");
@@ -88,8 +87,8 @@ public class InterProcessSynchronizedAdvice {
         }
     }
 
-    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(final SynchronizerLockRegistryConfiguration[] locks,
-            final LockRegistryFactory factory) {
+    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(
+            final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         Preconditions.checkArgument(locks != null, "Undefined lock definitions.");
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
