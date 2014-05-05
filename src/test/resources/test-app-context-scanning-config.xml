@@ -10,6 +10,9 @@
     <context:annotation-config />
     <aop:aspectj-autoproxy />
 
+	<!-- boilerplate synchronizer configuration. this line injects synchronizer into your app context. -->
+	<context:component-scan base-package="com.mass.concurrent.sync.springaop.config" />
+	
 	<!-- this is the service I want to synchronize -->
     <bean class="com.mass.concurrent.sync.springaop.SpringIntegrationTest.SynchronizedAlarms" />
 
@@ -26,7 +29,4 @@
 	</bean>
 	<!-- end custom, user-provided synchronizer configuration -->
 	
-	<!-- boilerplate synchronizer configuration. this line injects synchronizer into your app context. -->
-    <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerAdviceConfigurationBean" />
-        
 </beans>

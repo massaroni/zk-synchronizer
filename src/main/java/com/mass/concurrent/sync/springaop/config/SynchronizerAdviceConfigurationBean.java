@@ -1,4 +1,4 @@
-package com.mass.concurrent.sync.springaop;
+package com.mass.concurrent.sync.springaop.config;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
-import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
-import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
-import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
+import com.mass.concurrent.sync.springaop.SynchronizerAdvice;
 import com.mass.concurrent.sync.zookeeper.LockRegistries;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 
@@ -27,6 +25,7 @@ import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
  * 
  * @author kmassaroni
  */
+@Configuration
 public class SynchronizerAdviceConfigurationBean implements ApplicationContextAware {
     private ApplicationContext context;
 
@@ -36,19 +35,17 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     @Autowired
     private SynchronizerLockRegistryConfiguration[] lockDefinitions;
 
-    private final Supplier<SynchronizerAdvice> adviceSupplier = Suppliers
-            .memoize(new Supplier<SynchronizerAdvice>() {
-                @Override
-                public SynchronizerAdvice get() {
-                    checkArgument(configuration != null, "Can't build advice: Undefined synchronizer configuration.");
-                    checkArgument(context != null, "Can't build advice: Undefined application context.");
+    private final Supplier<SynchronizerAdvice> adviceSupplier = Suppliers.memoize(new Supplier<SynchronizerAdvice>() {
+        @Override
+        public SynchronizerAdvice get() {
+            checkArgument(configuration != null, "Can't build advice: Undefined synchronizer configuration.");
+            checkArgument(context != null, "Can't build advice: Undefined application context.");
 
-                    final LockRegistryFactory factory = registryFactory();
-                    final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions,
-                            factory);
-                    return advice;
-                }
-            });
+            final LockRegistryFactory factory = registryFactory();
+            final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions, factory);
+            return advice;
+        }
+    });
 
     private LockRegistryFactory registryFactory() {
         final SynchronizerScope scope = configuration.getScope();
