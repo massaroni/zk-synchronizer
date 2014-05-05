@@ -19,19 +19,13 @@ dependencies {
 	compile 'org.springframework:spring-context:3.2.8.RELEASE'
 	compile 'org.springframework:spring-core:3.2.8.RELEASE'
 	compile 'org.springframework:spring-aspects:3.2.8.RELEASE'
-	compile 'org.springframework.security:spring-security-core:3.2.3.RELEASE'
-	compile 'cglib:cglib:2.2.2'
 	compile 'commons-lang:commons-lang:2.6'
     compile 'commons-codec:commons-codec:1.8'
-	compile 'commons-io:commons-io:2.4'
 	compile 'commons-collections:commons-collections:3.2.1'
-	compile 'org.apache.commons:commons-lang3:3.1'
-	compile 'com.google.guava:guava:14.0.1'
 
 	testCompile 'org.springframework:spring-test:3.1.0.RELEASE'
 	testCompile 'junit:junit:4.11'
 	testCompile 'org.mockito:mockito-all:1.9.5'
-	testCompile 'org.databene:contiperf:2.0.0'
 }
 
 //Allow the test scripts to inherit command line properties.
