@@ -30,17 +30,17 @@ import com.mass.lang.MethodParameterAnnotation;
  */
 @Aspect
 @Order(Integer.MIN_VALUE)
-public class InterProcessSynchronizedAdvice {
-    private static final Log log = LogFactory.getLog(InterProcessSynchronizedAdvice.class);
+public class SynchronizerAdvice {
+    private static final Log log = LogFactory.getLog(SynchronizerAdvice.class);
 
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
 
     @Autowired
-    public InterProcessSynchronizedAdvice(final SynchronizerLockRegistryConfiguration[] locks,
+    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks,
             final LockRegistryFactory factory) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
-        log.info("new InterProcessSynchronizedAdvice");
+        log.info("new SynchronizerAdvice");
 
         if (locks == null) {
             lockRegistries = null;

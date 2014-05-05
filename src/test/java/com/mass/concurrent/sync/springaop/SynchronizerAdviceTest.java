@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
-public class InterProcessSynchronizedAdviceTest {
+public class SynchronizerAdviceTest {
     @Test
     public void testAopProxy_InterfaceTarget_Proxied() throws Throwable {
         final TestService target = new TestService();

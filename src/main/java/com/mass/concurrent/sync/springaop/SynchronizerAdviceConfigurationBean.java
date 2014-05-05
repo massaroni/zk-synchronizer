@@ -36,15 +36,15 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     @Autowired
     private SynchronizerLockRegistryConfiguration[] lockDefinitions;
 
-    private final Supplier<InterProcessSynchronizedAdvice> adviceSupplier = Suppliers
-            .memoize(new Supplier<InterProcessSynchronizedAdvice>() {
+    private final Supplier<SynchronizerAdvice> adviceSupplier = Suppliers
+            .memoize(new Supplier<SynchronizerAdvice>() {
                 @Override
-                public InterProcessSynchronizedAdvice get() {
+                public SynchronizerAdvice get() {
                     checkArgument(configuration != null, "Can't build advice: Undefined synchronizer configuration.");
                     checkArgument(context != null, "Can't build advice: Undefined application context.");
 
                     final LockRegistryFactory factory = registryFactory();
-                    final InterProcessSynchronizedAdvice advice = new InterProcessSynchronizedAdvice(lockDefinitions,
+                    final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions,
                             factory);
                     return advice;
                 }
@@ -75,7 +75,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     }
 
     @Bean
-    public InterProcessSynchronizedAdvice synchronizer() throws Exception {
+    public SynchronizerAdvice synchronizer() throws Exception {
         return adviceSupplier.get();
     }
 

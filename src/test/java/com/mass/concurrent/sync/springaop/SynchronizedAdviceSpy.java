@@ -28,7 +28,7 @@ import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
  */
 public class SynchronizedAdviceSpy {
     private final ReentrantLock mockLock;
-    private final InterProcessSynchronizedAdvice adviceSpy;
+    private final SynchronizerAdvice adviceSpy;
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
         final SynchronizerLockRegistryConfiguration lockDefinition = new SynchronizerLockRegistryConfiguration(
@@ -50,10 +50,10 @@ public class SynchronizedAdviceSpy {
 
         final SynchronizerLockRegistryConfiguration[] lockDefinitions = { lockDefinition };
 
-        adviceSpy = Mockito.spy(new InterProcessSynchronizedAdvice(lockDefinitions, mockRegistryFactory));
+        adviceSpy = Mockito.spy(new SynchronizerAdvice(lockDefinitions, mockRegistryFactory));
     }
 
-    public InterProcessSynchronizedAdvice getAdviceSpy() {
+    public SynchronizerAdvice getAdviceSpy() {
         return adviceSpy;
     }
 
