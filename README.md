@@ -12,9 +12,9 @@ Your use case:
 
 ## Installing
 
-**This is a beta release, and I'm definitely rolling out some small improvements and api-breaking changes, in the next couple days.**
+**This is a beta release, despite the version number.**
 
-As of version 1.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
+As of version 1.1.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
 
 ### Requirements
 
@@ -24,7 +24,7 @@ Spring AOP, and a Zookeeper server
 
 ## Just Annotate Your Java Method
 
-You can sprinkle these @Synchronized annotations on parameters of public methods in spring-managed classes.
+You can sprinkle these @Synchronized annotations on parameters of public methods in spring-managed classes. This advice supports one @Synchronized annotation, on public methods. 
 
 ```java
 @Service
@@ -69,25 +69,28 @@ Pure-XML Style, with all the available configuration, including optional propert
     <aop:aspectj-autoproxy />
 
 	<!-- boilerplate synchronizer configuration. this line injects synchronizer into your app context. -->
-    <bean class="com.mass.concurrent.sync.springaop.SynchronizerAdviceConfigurationBean" />
+    <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerAdviceConfigurationBean" />
+    <!-- or you can component-scan this package: -->
+    <-- <context:component-scan base-package="com.mass.concurrent.sync.springaop.config" /> -->
 
-	<!-- this is the service I want to synchronize -->
+	<!-- these are the services I want to synchronize -->
     <bean class="com.me.myservices.ServiceWithCriticalSection" />
+    <bean class="com.me.myservices.SomeUnrelatedService" />
 
 	<!-- custom, user-provided synchronizer configuration -->
 	
 	<!-- you need one lock definition for each lock registry named in a synchronizer annotation, like this: @Synchronized("myLockRegistry") --> 
-    <bean class="com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition">
+    <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration">
     	<constructor-arg name="name" value="myPoolOfResources" />
     	<constructor-arg name="lockKeyFactory">
     		<!-- you can use a prepackaged lock key factory, or make one for your own model -->
     		<!-- this lock key factory must accept the type of method parameter you're annotating -->
-    		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
+    		<bean class="com.mass.concurrent.sync.keyfactories.StringLockKeyFactory" />
     	</constructor-arg>
     </bean>
     
     <!-- here's another lock registry, for another pool of resources --> 
-    <bean class="com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition">
+    <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration">
     	<constructor-arg name="name" value="anotherPoolOfResources" />
     	
     	<!-- optionally, you can override the default locking policy, for individual registries -->
@@ -96,18 +99,18 @@ Pure-XML Style, with all the available configuration, including optional propert
     	<constructor-arg name="lockKeyFactory">
     		<!-- you can use a prepackaged lock key factory, or make one for your own model -->
     		<!-- this lock key factory must accept the type of method parameter you're annotating -->
-    		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.IntegerLockKeyFactory" />
+    		<bean class="com.mass.concurrent.sync.keyfactories.IntegerLockKeyFactory" />
     	</constructor-arg>
     </bean>
     
     <!-- this is the global Synchronizer configuration bean, and you need exactly one per app context -->
 	<bean class="com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration" >
-		<!-- this says we should use Zookeeper based locks for everything -->
+		<!-- this says we should use Zookeeper based locks for everything (see the SynchronizerScope class) -->
 		<!-- ZOOKEEPER = zk mutexes -->
 		<!-- LOCAL_JVM = plain java.util.concurrent locks (not going to synchronize your cluster) -->
 		<constructor-arg name="scope" value="ZOOKEEPER" />
 		
-		<!-- (optional) default lock policy that applies to all lock registries -->
+		<!-- (optional) default lock policy that applies to all lock registries (see the SynchronizerLockingPolicy class)-->
 		<!-- STRICT = throw errors and deny access to critical sections if you lose your connection to zookeeper -->
 		<!-- BEST_EFFORT = fail over to a jvm-scoped lock, if there's a zookeeper error -->
 		<constructor-arg name="defaultLockingPolicy" value="STRICT" />
