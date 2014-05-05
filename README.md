@@ -14,7 +14,7 @@ Your use case:
 
 **This is a beta release, despite the version number.**
 
-As of version 1.1.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
+As of version 2.0.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
 
 ### Requirements
 
