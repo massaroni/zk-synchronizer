@@ -18,7 +18,7 @@ import com.mass.core.Word;
  * @author kmassaroni
  * @param <K>
  */
-public class InterProcessLockRegistry<K> implements LockRegistry<K> {
+class InterProcessLockRegistry<K> implements LockRegistry<K> {
     private final InterProcessReentrantLockRegistry locks;
     private final SynchronizerLockKeyFactory<K> keyFactory;
 
