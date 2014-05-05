@@ -53,7 +53,7 @@ class InterProcessLockRegistry<K> implements LockRegistry<K> {
 
     @Override
     public ReentrantLock getLock(final K key) {
-        final InterProcessLockKey lockKey = keyFactory.toKey(key);
+        final SynchronizerLockKey lockKey = keyFactory.toKey(key);
         Preconditions.checkArgument(lockKey != null, "Null lock key.");
         return locks.getLock(lockKey);
     }

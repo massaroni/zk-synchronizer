@@ -3,14 +3,20 @@ package com.mass.concurrent.sync.zookeeper;
 import static com.mass.core.PatternPrecondition.WORD_PRECONDITION;
 
 import com.google.common.base.Preconditions;
+import com.mass.core.Word;
 
-public final class InterProcessLockKey {
+public final class SynchronizerLockKey {
     private final String value;
 
-    public InterProcessLockKey(final String value) {
+    public SynchronizerLockKey(final String value) {
         Preconditions.checkArgument(value != null, "Undefined lock key.");
         WORD_PRECONDITION.checkArgument(value, "Lock key can't contain a non-word character: '%s'", value);
         this.value = value;
+    }
+
+    public SynchronizerLockKey(final Word word) {
+        Preconditions.checkArgument(word != null, "Undefined word.");
+        value = word.getValue();
     }
 
     public String getValue() {
@@ -33,7 +39,7 @@ public final class InterProcessLockKey {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final InterProcessLockKey other = (InterProcessLockKey) obj;
+        final SynchronizerLockKey other = (SynchronizerLockKey) obj;
         if (value == null) {
             if (other.value != null) {
                 return false;

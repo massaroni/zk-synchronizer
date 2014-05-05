@@ -1,7 +1,7 @@
 package com.mass.concurrent.sync.zookeeper.keyfactories;
 
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
 import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 
 /**
@@ -12,8 +12,8 @@ import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
  */
 public class IntegerLockKeyFactory implements SynchronizerLockKeyFactory<Integer> {
     @Override
-    public InterProcessLockKey toKey(final Integer key) {
+    public SynchronizerLockKey toKey(final Integer key) {
         Preconditions.checkArgument(key != null, "Undefined lock key.");
-        return new InterProcessLockKey(key.toString());
+        return new SynchronizerLockKey(key.toString());
     }
 }

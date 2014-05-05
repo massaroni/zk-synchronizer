@@ -17,7 +17,7 @@ import org.mockito.Mockito;
 
 import com.mass.concurrent.sync.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 
@@ -71,7 +71,7 @@ public class SynchronizedAdviceSpy {
 
     private static class NoOpLockKeyFactory implements SynchronizerLockKeyFactory<Object> {
         @Override
-        public InterProcessLockKey toKey(final Object key) {
+        public SynchronizerLockKey toKey(final Object key) {
             return null;
         }
     }

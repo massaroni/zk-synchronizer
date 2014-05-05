@@ -2,7 +2,7 @@ package com.mass.concurrent.sync.zookeeper.keyfactories;
 
 import com.google.common.base.Preconditions;
 import com.mass.codec.Base64;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
 import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 
 /**
@@ -13,10 +13,10 @@ import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
  */
 public class ToStringLockKeyFactory implements SynchronizerLockKeyFactory<Object> {
     @Override
-    public InterProcessLockKey toKey(final Object key) {
+    public SynchronizerLockKey toKey(final Object key) {
         Preconditions.checkArgument(key != null, "Undefined lock key.");
         final String str = key.toString();
         final String zkSafe = Base64.encodeURLSafe(str);
-        return new InterProcessLockKey(zkSafe);
+        return new SynchronizerLockKey(zkSafe);
     }
 }

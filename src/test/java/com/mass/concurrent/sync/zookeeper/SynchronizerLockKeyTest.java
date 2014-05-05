@@ -2,40 +2,47 @@ package com.mass.concurrent.sync.zookeeper;
 
 import org.junit.Test;
 
-public class InterProcessLockKeyTest {
+import com.mass.core.Word;
+
+public class SynchronizerLockKeyTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testEmptyKey() {
-        new InterProcessLockKey("");
+        new SynchronizerLockKey("");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testNullKey() {
-        new InterProcessLockKey(null);
+    public void testNullStringKey() {
+        new SynchronizerLockKey((String) null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullWordKey() {
+        new SynchronizerLockKey((Word) null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testWhitespaceKey() {
-        new InterProcessLockKey("x x");
+        new SynchronizerLockKey("x x");
     }
 
     public void testValidKey() {
-        new InterProcessLockKey("a-Z_1-0");
+        new SynchronizerLockKey("a-Z_1-0");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testMultiplePathParts() {
-        new InterProcessLockKey("a/b");
+        new SynchronizerLockKey("a/b");
     }
 
     public void testNumberKey() {
-        new InterProcessLockKey("100001839854877");
+        new SynchronizerLockKey("100001839854877");
     }
 
     public void testNumberKeyFromLong() {
         final long number = 100001839854877L;
         final String serializedNumber = Long.toString(number);
-        new InterProcessLockKey(serializedNumber);
+        new SynchronizerLockKey(serializedNumber);
     }
 
 }

@@ -17,7 +17,7 @@ import com.mass.concurrent.sync.LockRegistry;
  * @param <K>
  */
 class LocalLockRegistry<K> implements LockRegistry<K> {
-    private final Cache<InterProcessLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
+    private final Cache<SynchronizerLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
     private final LockFactory lockFactory = new LockFactory();
     private final SynchronizerLockKeyFactory<K> lockKeyFactory;
 
@@ -30,7 +30,7 @@ class LocalLockRegistry<K> implements LockRegistry<K> {
     public ReentrantLock getLock(final K key) {
         Preconditions.checkArgument(key != null, "Undefined key.");
 
-        final InterProcessLockKey lockKey = lockKeyFactory.toKey(key);
+        final SynchronizerLockKey lockKey = lockKeyFactory.toKey(key);
         Preconditions.checkArgument(lockKey != null, "Lock factory produced a null lock key.");
 
         try {
