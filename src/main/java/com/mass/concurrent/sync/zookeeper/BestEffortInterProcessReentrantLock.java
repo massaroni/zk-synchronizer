@@ -16,7 +16,7 @@ import org.joda.time.DateTimeUtils;
  * 
  * @author kmassaroni
  */
-public class BestEffortInterProcessReentrantLock extends ReentrantLock {
+class BestEffortInterProcessReentrantLock extends ReentrantLock {
     private static final long serialVersionUID = -7639919128834742605L;
 
     private final InterProcessMutex mutex;

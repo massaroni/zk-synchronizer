@@ -16,7 +16,7 @@ import com.mass.core.Word;
  * 
  * @author kmassaroni
  */
-public class BestEffortInterProcessReentrantLockRegistry extends InterProcessReentrantLockRegistry {
+class BestEffortInterProcessReentrantLockRegistry extends InterProcessReentrantLockRegistry {
 
     public BestEffortInterProcessReentrantLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final CuratorFramework zkClient) {

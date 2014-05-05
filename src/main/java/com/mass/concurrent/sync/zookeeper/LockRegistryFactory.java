@@ -1,8 +1,8 @@
-package com.mass.concurrent.sync.springaop;
+package com.mass.concurrent.sync.zookeeper;
 
 import com.mass.concurrent.sync.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 
-interface LockRegistryFactory {
+public interface LockRegistryFactory {
     public LockRegistry<Object> newLockRegistry(final SynchronizerLockRegistryConfiguration definition);
 }

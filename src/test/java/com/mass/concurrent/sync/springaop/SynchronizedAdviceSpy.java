@@ -17,6 +17,7 @@ import org.mockito.Mockito;
 
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 

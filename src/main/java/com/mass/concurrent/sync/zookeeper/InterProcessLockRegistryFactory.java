@@ -1,4 +1,4 @@
-package com.mass.concurrent.sync.springaop;
+package com.mass.concurrent.sync.zookeeper;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.mass.core.Preconditions.checkNotBlank;
@@ -8,8 +8,6 @@ import org.apache.curator.framework.CuratorFramework;
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 
 class InterProcessLockRegistryFactory implements LockRegistryFactory {
     private final CuratorFramework zkClient;

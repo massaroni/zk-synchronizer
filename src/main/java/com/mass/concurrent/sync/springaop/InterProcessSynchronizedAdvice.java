@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mass.concurrent.sync.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 import com.mass.lang.MethodParameterAnnotation;
 
 /**

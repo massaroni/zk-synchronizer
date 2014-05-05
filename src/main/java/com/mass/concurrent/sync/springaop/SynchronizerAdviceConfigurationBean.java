@@ -17,6 +17,8 @@ import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
+import com.mass.concurrent.sync.zookeeper.LockRegistries;
+import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 
 /**
  * This bean factory makes it easier to configure a Synchronizer spring application context, because it conditionally
@@ -55,12 +57,12 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
 
         switch (scope) {
         case LOCAL_JVM:
-            return new LocalLockRegistryFactory();
+            return LockRegistries.newLocalLockRegistryFactory();
         case ZOOKEEPER:
             final CuratorFramework zkClient = context.getBean(CuratorFramework.class);
             checkState(zkClient != null,
                     "No CuratorFramework in the application context, required by Synchronizer for zookeeper inter-process locking.");
-            return new InterProcessLockRegistryFactory(zkClient, defaultLockingPolicy, zkBasePath);
+            return LockRegistries.newInterProcessLockRegistryFactory(zkClient, defaultLockingPolicy, zkBasePath);
         default:
             throw new IllegalStateException("Unexpected SynchronizerScope: " + scope);
         }

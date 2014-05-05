@@ -16,7 +16,7 @@ import com.mass.concurrent.sync.LockRegistry;
  * @author kmassaroni
  * @param <K>
  */
-public class LocalLockRegistry<K> implements LockRegistry<K> {
+class LocalLockRegistry<K> implements LockRegistry<K> {
     private final Cache<InterProcessLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
     private final LockFactory lockFactory = new LockFactory();
     private final SynchronizerLockKeyFactory<K> lockKeyFactory;
