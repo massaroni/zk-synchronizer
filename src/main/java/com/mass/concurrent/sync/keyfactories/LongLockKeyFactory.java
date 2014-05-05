@@ -1,8 +1,8 @@
-package com.mass.concurrent.sync.zookeeper.keyfactories;
+package com.mass.concurrent.sync.keyfactories;
 
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 
 /**
  * Use longs as interprocess lock keys. The key will be the human readable long, so your zookeeper paths are easy to

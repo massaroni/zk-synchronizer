@@ -1,4 +1,4 @@
-package com.mass.concurrent.sync.zookeeper;
+package com.mass.concurrent.sync;
 
 import static com.mass.core.PatternPrecondition.WORD_PRECONDITION;
 

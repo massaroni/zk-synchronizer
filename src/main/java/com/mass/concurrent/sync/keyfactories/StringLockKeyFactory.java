@@ -1,8 +1,8 @@
-package com.mass.concurrent.sync.zookeeper.keyfactories;
+package com.mass.concurrent.sync.keyfactories;
 
 import com.mass.codec.Base64;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.Preconditions;
 
 /**

@@ -17,7 +17,7 @@
     <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration">
     	<constructor-arg name="name" value="callers" />
     	<constructor-arg name="lockKeyFactory">
-    		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
+    		<bean class="com.mass.concurrent.sync.keyfactories.StringLockKeyFactory" />
     	</constructor-arg>
     </bean>
 	<bean class="com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration" >

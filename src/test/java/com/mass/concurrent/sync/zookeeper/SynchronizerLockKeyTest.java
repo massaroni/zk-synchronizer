@@ -2,6 +2,7 @@ package com.mass.concurrent.sync.zookeeper;
 
 import org.junit.Test;
 
+import com.mass.concurrent.sync.SynchronizerLockKey;
 import com.mass.core.Word;
 
 public class SynchronizerLockKeyTest {

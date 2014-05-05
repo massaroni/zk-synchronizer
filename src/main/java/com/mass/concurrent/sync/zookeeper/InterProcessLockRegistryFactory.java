@@ -6,6 +6,7 @@ import static com.mass.core.Preconditions.checkNotBlank;
 import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.base.Preconditions;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 

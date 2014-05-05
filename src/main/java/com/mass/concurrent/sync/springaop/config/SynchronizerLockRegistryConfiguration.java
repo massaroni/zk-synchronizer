@@ -3,7 +3,7 @@ package com.mass.concurrent.sync.springaop.config;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.Word;
 import com.sun.istack.internal.Nullable;
 

@@ -16,10 +16,10 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
 import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.SynchronizerLockKey;
+import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKey;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
-import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 
 /**
  * This is for a one-shot disposable use case in unit tests.
