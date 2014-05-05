@@ -1,7 +1,7 @@
 package com.mass.concurrent.sync.zookeeper;
 
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.LockRegistry;
+import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 
 /**

@@ -6,7 +6,7 @@ import org.apache.curator.framework.CuratorFramework;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.LockRegistry;
+import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.core.Word;
 
