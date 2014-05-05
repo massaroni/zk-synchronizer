@@ -19,9 +19,9 @@ import com.mass.concurrent.sync.LockRegistry;
 public class LocalLockRegistry<K> implements LockRegistry<K> {
     private final Cache<InterProcessLockKey, ReentrantLock> locks = CacheBuilder.newBuilder().softValues().build();
     private final LockFactory lockFactory = new LockFactory();
-    private final InterProcessLockKeyFactory<K> lockKeyFactory;
+    private final SynchronizerLockKeyFactory<K> lockKeyFactory;
 
-    public LocalLockRegistry(final InterProcessLockKeyFactory<K> lockKeyFactory) {
+    public LocalLockRegistry(final SynchronizerLockKeyFactory<K> lockKeyFactory) {
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
         this.lockKeyFactory = lockKeyFactory;
     }

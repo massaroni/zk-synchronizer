@@ -3,7 +3,7 @@ package com.mass.concurrent.sync.zookeeper.keyfactories;
 import com.google.common.base.Preconditions;
 import com.mass.codec.Base64;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 
 /**
  * Use any object as an interprocess lock. Lock keys are derived from the Base64'd toString() of the object, because not
@@ -11,7 +11,7 @@ import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
  * 
  * @author kmassaroni
  */
-public class ToStringLockKeyFactory implements InterProcessLockKeyFactory<Object> {
+public class ToStringLockKeyFactory implements SynchronizerLockKeyFactory<Object> {
     @Override
     public InterProcessLockKey toKey(final Object key) {
         Preconditions.checkArgument(key != null, "Undefined lock key.");

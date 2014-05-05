@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Bean;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
 import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
 import com.mass.concurrent.sync.springaop.config.SynchronizerScope;
 
@@ -32,7 +32,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
     private SynchronizerConfiguration configuration;
 
     @Autowired
-    private InterProcessLockDefinition[] lockDefinitions;
+    private SynchronizerLockRegistryConfiguration[] lockDefinitions;
 
     private final Supplier<InterProcessSynchronizedAdvice> adviceSupplier = Suppliers
             .memoize(new Supplier<InterProcessSynchronizedAdvice>() {

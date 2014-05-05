@@ -2,7 +2,7 @@ package com.mass.concurrent.sync.springaop;
 
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.LockRegistry;
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.LocalLockRegistry;
 
 /**
@@ -15,7 +15,7 @@ public class LocalLockRegistryFactory implements LockRegistryFactory {
 
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public LockRegistry<Object> newLockRegistry(final InterProcessLockDefinition definition) {
+    public LockRegistry<Object> newLockRegistry(final SynchronizerLockRegistryConfiguration definition) {
         Preconditions.checkArgument(definition != null, "Undefined lock registry definition.");
         return new LocalLockRegistry(definition.getLockKeyFactory());
     }

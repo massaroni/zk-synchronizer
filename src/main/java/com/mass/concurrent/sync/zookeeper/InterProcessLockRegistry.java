@@ -20,11 +20,11 @@ import com.mass.core.Word;
  */
 public class InterProcessLockRegistry<K> implements LockRegistry<K> {
     private final InterProcessReentrantLockRegistry locks;
-    private final InterProcessLockKeyFactory<K> keyFactory;
+    private final SynchronizerLockKeyFactory<K> keyFactory;
 
     public InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final CuratorFramework zkClient,
-            final InterProcessLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory) {
         this(rootZkPath, lockRegistryName, lockingPolicy, zkClient == null ? null : new InterProcessMutexFactory(
                 zkClient), keyFactory);
     }
@@ -32,7 +32,7 @@ public class InterProcessLockRegistry<K> implements LockRegistry<K> {
     @VisibleForTesting
     InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final InterProcessMutexFactory mutexFactory,
-            final InterProcessLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory) {
         Preconditions.checkArgument(mutexFactory != null);
         Preconditions.checkArgument(lockingPolicy != null, "Undefined locking policy.");
 

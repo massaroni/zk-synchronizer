@@ -19,7 +19,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mass.concurrent.sync.LockRegistry;
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.lang.MethodParameterAnnotation;
 
 /**
@@ -37,7 +37,7 @@ public class InterProcessSynchronizedAdvice {
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
 
     @Autowired
-    public InterProcessSynchronizedAdvice(final InterProcessLockDefinition[] locks, final LockRegistryFactory factory) {
+    public InterProcessSynchronizedAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         log.info("new InterProcessSynchronizedAdvice");
@@ -87,14 +87,14 @@ public class InterProcessSynchronizedAdvice {
         }
     }
 
-    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(final InterProcessLockDefinition[] locks,
+    private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(final SynchronizerLockRegistryConfiguration[] locks,
             final LockRegistryFactory factory) {
         Preconditions.checkArgument(locks != null, "Undefined lock definitions.");
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         final Map<String, LockRegistry<Object>> registries = Maps.newHashMap();
 
-        for (final InterProcessLockDefinition lockDefinition : locks) {
+        for (final SynchronizerLockRegistryConfiguration lockDefinition : locks) {
             final String name = lockDefinition.getName().getValue();
             Preconditions.checkArgument(!registries.containsKey(name),
                     "%s is already registered as an interprocess lock registry.", name);

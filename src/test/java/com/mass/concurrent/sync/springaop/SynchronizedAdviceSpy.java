@@ -15,9 +15,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
-import com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition;
+import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockKey;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.zookeeper.InterProcessLockRegistry;
 
 /**
@@ -30,7 +30,7 @@ public class SynchronizedAdviceSpy {
     private final InterProcessSynchronizedAdvice adviceSpy;
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
-        final InterProcessLockDefinition lockDefinition = new InterProcessLockDefinition(lockName,
+        final SynchronizerLockRegistryConfiguration lockDefinition = new SynchronizerLockRegistryConfiguration(lockName,
                 new NoOpLockKeyFactory());
 
         mockLock = mock(ReentrantLock.class);
@@ -47,7 +47,7 @@ public class SynchronizedAdviceSpy {
         final LockRegistryFactory mockRegistryFactory = mock(LockRegistryFactory.class);
         when(mockRegistryFactory.newLockRegistry(eq(lockDefinition))).thenReturn(mockLockRegistry);
 
-        final InterProcessLockDefinition[] lockDefinitions = { lockDefinition };
+        final SynchronizerLockRegistryConfiguration[] lockDefinitions = { lockDefinition };
 
         adviceSpy = Mockito.spy(new InterProcessSynchronizedAdvice(lockDefinitions, mockRegistryFactory));
     }
@@ -68,7 +68,7 @@ public class SynchronizedAdviceSpy {
         verify(mockLock, never()).unlock();
     }
 
-    private static class NoOpLockKeyFactory implements InterProcessLockKeyFactory<Object> {
+    private static class NoOpLockKeyFactory implements SynchronizerLockKeyFactory<Object> {
         @Override
         public InterProcessLockKey toKey(final Object key) {
             return null;

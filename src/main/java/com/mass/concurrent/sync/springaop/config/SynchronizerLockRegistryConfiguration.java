@@ -3,7 +3,7 @@ package com.mass.concurrent.sync.springaop.config;
 import org.apache.commons.lang.StringUtils;
 
 import com.google.common.base.Preconditions;
-import com.mass.concurrent.sync.zookeeper.InterProcessLockKeyFactory;
+import com.mass.concurrent.sync.zookeeper.SynchronizerLockKeyFactory;
 import com.mass.core.Word;
 import com.sun.istack.internal.Nullable;
 
@@ -13,9 +13,9 @@ import com.sun.istack.internal.Nullable;
  * 
  * @author kmassaroni
  */
-public class InterProcessLockDefinition {
+public class SynchronizerLockRegistryConfiguration {
     private final Word name;
-    private final InterProcessLockKeyFactory<?> lockKeyFactory;
+    private final SynchronizerLockKeyFactory<?> lockKeyFactory;
     private final SynchronizerLockingPolicy policyOverride;
 
     /**
@@ -25,7 +25,7 @@ public class InterProcessLockDefinition {
      *            - converts your proprietary lock-key model into a lock key that we can use with zookeeper. this is
      *            required even if you're not using zookeeper.
      */
-    public InterProcessLockDefinition(final String name, final InterProcessLockKeyFactory<?> lockKeyFactory) {
+    public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockKeyFactory<?> lockKeyFactory) {
         this(name, null, lockKeyFactory);
     }
 
@@ -38,8 +38,8 @@ public class InterProcessLockDefinition {
      * @param policyOverride
      *            - (optional) overrides the default locking policy, for this lock registry.
      */
-    public InterProcessLockDefinition(final String name, final @Nullable SynchronizerLockingPolicy policyOverride,
-            final InterProcessLockKeyFactory<?> lockKeyFactory) {
+    public SynchronizerLockRegistryConfiguration(final String name,
+            final @Nullable SynchronizerLockingPolicy policyOverride, final SynchronizerLockKeyFactory<?> lockKeyFactory) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
 
@@ -52,7 +52,7 @@ public class InterProcessLockDefinition {
         return name;
     }
 
-    public InterProcessLockKeyFactory<?> getLockKeyFactory() {
+    public SynchronizerLockKeyFactory<?> getLockKeyFactory() {
         return lockKeyFactory;
     }
 
@@ -62,7 +62,7 @@ public class InterProcessLockDefinition {
 
     @Override
     public String toString() {
-        return "InterProcessLockDefinition [name=" + name + ", lockKeyFactory=" + lockKeyFactory + ", policyOverride="
-                + policyOverride + "]";
+        return "SynchronizerLockRegistryConfiguration [name=" + name + ", lockKeyFactory=" + lockKeyFactory
+                + ", policyOverride=" + policyOverride + "]";
     }
 }

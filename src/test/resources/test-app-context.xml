@@ -14,7 +14,7 @@
     <bean class="com.mass.concurrent.sync.springaop.SpringIntegrationTest.SynchronizedAlarms" />
 
 	<!-- custom, user-provided synchronizer configuration -->    
-    <bean class="com.mass.concurrent.sync.springaop.config.InterProcessLockDefinition">
+    <bean class="com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration">
     	<constructor-arg name="name" value="callers" />
     	<constructor-arg name="lockKeyFactory">
     		<bean class="com.mass.concurrent.sync.zookeeper.keyfactories.StringLockKeyFactory" />
