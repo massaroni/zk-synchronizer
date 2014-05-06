@@ -14,17 +14,27 @@ Your use case:
 
 **This is a beta release, despite the version number.**
 
-### Maven POM
+### Maven (POM)
 
 Add this repository in your `pom.xml` file:
 
 ```xml
- <repositories>
+<repositories>
     <repository>
         <id>mass-public-synchronizer-releases</id>
         <url>https://raw.github.com/massaroni/zk-synchronizer/maven-repo/mvn/releases</url>
     </repository>
 </repositories>
+```
+
+### Maven (Gradle)
+
+```groovy
+repositories {
+    maven {
+        url "https://raw.github.com/massaroni/zk-synchronizer/maven-repo/mvn/releases"
+    }
+}
 ```
 
 ### Requirements
