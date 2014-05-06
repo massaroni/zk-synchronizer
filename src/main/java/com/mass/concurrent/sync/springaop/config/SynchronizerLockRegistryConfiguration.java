@@ -5,7 +5,6 @@ import org.apache.commons.lang.StringUtils;
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.Word;
-import com.sun.istack.internal.Nullable;
 
 /**
  * This is a user-provided per-lock configuration bean that you need in your spring application context. The name of
@@ -38,8 +37,8 @@ public class SynchronizerLockRegistryConfiguration {
      * @param policyOverride
      *            - (optional) overrides the default locking policy, for this lock registry.
      */
-    public SynchronizerLockRegistryConfiguration(final String name,
-            final @Nullable SynchronizerLockingPolicy policyOverride, final SynchronizerLockKeyFactory<?> lockKeyFactory) {
+    public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
+            final SynchronizerLockKeyFactory<?> lockKeyFactory) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
 
