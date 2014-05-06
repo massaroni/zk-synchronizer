@@ -1,10 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-version = '2.0.0'
-group = 'com.massaroni'
+version = '2.1.0'
+group = 'com.mass'
 
 repositories { mavenCentral() }
 
@@ -28,9 +29,27 @@ dependencies {
 	testCompile 'org.mockito:mockito-all:1.9.5'
 }
 
-//Allow the test scripts to inherit command line properties.
-//sudo gradle build --continue -DGRIDGAIN_HOME=/Users/dinkar_ganti/gridgain
-//needed for running gridgain tests.
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "$projectDir/mvn"
+        }
+    }
+}
+
 test {
 	systemProperties = System.properties
 	testReport = true;
@@ -42,7 +61,6 @@ test {
 	onOutput { descriptor, event ->
 		logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
 	}
-	//systemProperties['user.dir'] = workingDir
 	jvmArgs '-XX:MaxPermSize=128m'
 }
 
