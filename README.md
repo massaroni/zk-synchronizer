@@ -14,7 +14,18 @@ Your use case:
 
 **This is a beta release, despite the version number.**
 
-As of version 2.0.0, the artifact is not hosted in any public maven repository, so you'll have to clone this repo and build it on your end.
+### Maven POM
+
+Add this repository in your `pom.xml` file:
+
+```xml
+ <repositories>
+    <repository>
+        <id>mass-public-synchronizer-releases</id>
+        <url>https://raw.github.com/massaroni/zk-synchronizer/maven-repo/mvn/releases</url>
+    </repository>
+</repositories>
+```
 
 ### Requirements
 
