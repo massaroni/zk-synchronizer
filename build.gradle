@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-version = '2.1.0'
+version = '2.1.1'
 group = 'com.mass'
 
 repositories { mavenCentral() }
