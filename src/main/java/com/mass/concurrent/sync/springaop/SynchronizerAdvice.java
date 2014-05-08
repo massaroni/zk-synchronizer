@@ -1,9 +1,11 @@
 package com.mass.concurrent.sync.springaop;
 
+import static java.lang.String.format;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
@@ -36,8 +38,7 @@ public class SynchronizerAdvice {
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
 
     @Autowired
-    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks,
-            final LockRegistryFactory factory) {
+    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         log.info("new SynchronizerAdvice");
@@ -77,8 +78,11 @@ public class SynchronizerAdvice {
             log.trace("Locking " + lockKey);
         }
 
-        Preconditions.checkState(lock.tryLock(5, TimeUnit.SECONDS),
-                "Timed out getting interprocess lock for registry %s, for key %s", lockName, lockKey);
+        if (!lock.tryLock(5, TimeUnit.SECONDS)) {
+            final String msg = format("Timed out getting interprocess synchronizer lock for registry %s, for key %s",
+                    lockName, lockKey);
+            throw new TimeoutException(msg);
+        }
 
         try {
             return joinPoint.proceed();
