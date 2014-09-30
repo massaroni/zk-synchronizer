@@ -1,5 +1,6 @@
 package com.mass.concurrent.sync.springaop;
 
+import static com.mass.concurrent.sync.springaop.SynchronizedMethodUtils.toTimeoutDuration;
 import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration.defaultTimeoutDuration;
 import static java.lang.String.format;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -86,7 +87,7 @@ public class SynchronizerAdvice {
         Preconditions.checkState(lock != null, "Can't get interprocess lock for registry %s, for key %s", lockName,
                 lockKey);
 
-        final PositiveDuration timeoutDuration = getTimeoutDuration(lockRegistry);
+        final PositiveDuration timeoutDuration = getTimeoutDuration(sync, lockRegistry);
         Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration for registry %s.", lockName);
 
         if (log.isTraceEnabled()) {
@@ -106,7 +107,13 @@ public class SynchronizerAdvice {
         }
     }
 
-    private PositiveDuration getTimeoutDuration(final LockRegistry<?> registry) {
+    private PositiveDuration getTimeoutDuration(final Synchronized annotation, final LockRegistry<?> registry) {
+        final PositiveDuration annotationTimeout = toTimeoutDuration(annotation);
+
+        if (annotationTimeout != null) {
+            return annotationTimeout;
+        }
+
         final PositiveDuration registryTimeout = registry.getTimeoutDuration();
         return registryTimeout != null ? registryTimeout : globalTimeoutDuration;
     }
