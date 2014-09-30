@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.PositiveDuration;
 import com.mass.core.Word;
+import com.sun.istack.internal.Nullable;
 
 /**
  * This is a user-provided per-lock configuration bean that you need in your spring application context. The name of
@@ -19,8 +20,6 @@ public class SynchronizerLockRegistryConfiguration {
     private final SynchronizerLockKeyFactory<?> lockKeyFactory;
     private final SynchronizerLockingPolicy policyOverride;
     private final PositiveDuration timeoutDuration;
-
-    public static final PositiveDuration defaultTimeoutDuration = PositiveDuration.standardSeconds(5);
 
     /**
      * @param name
@@ -44,7 +43,7 @@ public class SynchronizerLockRegistryConfiguration {
      */
     public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
             final SynchronizerLockKeyFactory<?> lockKeyFactory) {
-        this(name, policyOverride, lockKeyFactory, defaultTimeoutDuration);
+        this(name, policyOverride, lockKeyFactory, (PositiveDuration) null);
     }
 
     public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
@@ -64,10 +63,9 @@ public class SynchronizerLockRegistryConfiguration {
      *            - a thread will give up and throw a timeout exception if it can't get the lock in this time window.
      */
     public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
-            final SynchronizerLockKeyFactory<?> lockKeyFactory, final PositiveDuration timeoutDuration) {
+            final SynchronizerLockKeyFactory<?> lockKeyFactory, final @Nullable PositiveDuration timeoutDuration) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
-        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
 
         this.name = new Word(name);
         this.policyOverride = policyOverride;
@@ -87,6 +85,12 @@ public class SynchronizerLockRegistryConfiguration {
         return policyOverride;
     }
 
+    /**
+     * Get the lock-registry level timeout duration. This overrides the global default timeout duration, defined in the
+     * SynchronizerConfiguration bean.
+     * 
+     * @return null if this lock registry has no explicitly defined timeout duration
+     */
     public PositiveDuration getTimeoutDuration() {
         return timeoutDuration;
     }

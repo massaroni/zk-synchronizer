@@ -1,9 +1,15 @@
 package com.mass.concurrent.sync.springaop;
 
+import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration.defaultTimeoutDuration;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+import java.lang.reflect.UndeclaredThrowableException;
 
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
+
+import com.mass.core.PositiveDuration;
 
 public class SynchronizerAdviceTest {
     @Test
@@ -63,6 +69,78 @@ public class SynchronizerAdviceTest {
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
 
         final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc");
+
+        factory.addAspect(spy.getAdviceSpy());
+        final UnannotatedTestServiceInterface proxy = factory.getProxy();
+
+        final String actual = proxy.concat("abc", "def");
+
+        assertEquals("abcdef", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test
+    public void testAopProxy_UseRegistryTimeoutDuration() throws Throwable {
+        final AnnotatedTestSubclass target = new AnnotatedTestSubclass();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final PositiveDuration timeout1 = PositiveDuration.standardSeconds(1);
+        final PositiveDuration timeout4 = PositiveDuration.standardSeconds(4);
+        assertNotEquals(timeout1, timeout4);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc", timeout1, timeout4,
+                timeout1);
+
+        factory.addAspect(spy.getAdviceSpy());
+        final UnannotatedTestServiceInterface proxy = factory.getProxy();
+
+        final String actual = proxy.concat("abc", "def");
+
+        assertEquals("abcdef", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test
+    public void testAopProxy_UseGlobalTimeoutDuration() throws Throwable {
+        final AnnotatedTestSubclass target = new AnnotatedTestSubclass();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final PositiveDuration timeout1 = PositiveDuration.standardSeconds(1);
+        final PositiveDuration timeout4 = PositiveDuration.standardSeconds(4);
+
+        assertNotEquals(timeout1, defaultTimeoutDuration);
+        assertNotEquals(timeout4, defaultTimeoutDuration);
+        assertNotEquals(timeout1, timeout4);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc", timeout4, timeout4,
+                null);
+
+        factory.addAspect(spy.getAdviceSpy());
+        final UnannotatedTestServiceInterface proxy = factory.getProxy();
+
+        final String actual = proxy.concat("abc", "def");
+
+        assertEquals("abcdef", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test(expected = UndeclaredThrowableException.class)
+    public void testAopProxy_UseRegistrtyTimeoutDuration_BreakExpectations() throws Throwable {
+        final AnnotatedTestSubclass target = new AnnotatedTestSubclass();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final PositiveDuration timeout1 = PositiveDuration.standardSeconds(1);
+        final PositiveDuration timeout4 = PositiveDuration.standardSeconds(4);
+
+        assertNotEquals(timeout1, defaultTimeoutDuration);
+        assertNotEquals(timeout4, defaultTimeoutDuration);
+        assertNotEquals(timeout1, timeout4);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc", timeout4, timeout4,
+                timeout1);
 
         factory.addAspect(spy.getAdviceSpy());
         final UnannotatedTestServiceInterface proxy = factory.getProxy();
