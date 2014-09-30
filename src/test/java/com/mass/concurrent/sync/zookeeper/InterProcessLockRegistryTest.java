@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import com.mass.concurrent.sync.keyfactories.IntegerLockKeyFactory;
+import com.mass.core.PositiveDuration;
 
 public class InterProcessLockRegistryTest {
     @Test
@@ -22,10 +23,12 @@ public class InterProcessLockRegistryTest {
                 .thenReturn(mock(InterProcessMutex.class));
 
         final InterProcessLockRegistry<Integer> registry = new InterProcessLockRegistry<Integer>("/zk/base/path",
-                word("mylocks"), STRICT, mockMutexFactory, new IntegerLockKeyFactory());
+                word("mylocks"), STRICT, mockMutexFactory, new IntegerLockKeyFactory(),
+                PositiveDuration.standardSeconds(5));
 
         registry.getLock(777);
 
         verify(mockMutexFactory, times(1)).newMutex(Mockito.eq(expectedMutexPath));
     }
+
 }

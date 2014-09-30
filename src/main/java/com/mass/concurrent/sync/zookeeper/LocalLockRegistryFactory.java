@@ -16,7 +16,7 @@ class LocalLockRegistryFactory implements LockRegistryFactory {
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public LockRegistry<Object> newLockRegistry(final SynchronizerLockRegistryConfiguration definition) {
         Preconditions.checkArgument(definition != null, "Undefined lock registry definition.");
-        return new LocalLockRegistry(definition.getLockKeyFactory());
+        return new LocalLockRegistry(definition.getLockKeyFactory(), definition.getTimeoutDuration());
     }
 
 }

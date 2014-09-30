@@ -1,11 +1,12 @@
 package com.mass.concurrent.sync.springaop;
 
+import static com.mass.concurrent.sync.springaop.SynchronizedMethodUtils.toTimeoutDuration;
+import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration.defaultTimeoutDuration;
 import static java.lang.String.format;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
@@ -19,9 +20,12 @@ import org.springframework.core.annotation.Order;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
+import com.mass.core.PositiveDuration;
 import com.mass.lang.MethodParameterAnnotation;
 
 /**
@@ -36,10 +40,19 @@ public class SynchronizerAdvice {
     private static final Log log = LogFactory.getLog(SynchronizerAdvice.class);
 
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
+    private final PositiveDuration globalTimeoutDuration;
+
+    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
+        this(locks, factory, null);
+    }
 
     @Autowired
-    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
+    public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory,
+            final SynchronizerConfiguration globalConfig) {
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
+
+        globalTimeoutDuration = globalConfig == null ? defaultTimeoutDuration : globalConfig.getGlobalTimeoutDuration();
+        Preconditions.checkArgument(globalTimeoutDuration != null, "Undefined global timeout duration.");
 
         log.info("new SynchronizerAdvice");
 
@@ -74,14 +87,17 @@ public class SynchronizerAdvice {
         Preconditions.checkState(lock != null, "Can't get interprocess lock for registry %s, for key %s", lockName,
                 lockKey);
 
+        final PositiveDuration timeoutDuration = getTimeoutDuration(sync, lockRegistry);
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration for registry %s.", lockName);
+
         if (log.isTraceEnabled()) {
             log.trace("Locking " + lockKey);
         }
 
-        if (!lock.tryLock(5, TimeUnit.SECONDS)) {
+        if (!lock.tryLock(timeoutDuration.getMillis(), TimeUnit.MILLISECONDS)) {
             final String msg = format("Timed out getting interprocess synchronizer lock for registry %s, for key %s",
                     lockName, lockKey);
-            throw new TimeoutException(msg);
+            throw new UncheckedTimeoutException(msg);
         }
 
         try {
@@ -89,6 +105,17 @@ public class SynchronizerAdvice {
         } finally {
             lock.unlock();
         }
+    }
+
+    private PositiveDuration getTimeoutDuration(final Synchronized annotation, final LockRegistry<?> registry) {
+        final PositiveDuration annotationTimeout = toTimeoutDuration(annotation);
+
+        if (annotationTimeout != null) {
+            return annotationTimeout;
+        }
+
+        final PositiveDuration registryTimeout = registry.getTimeoutDuration();
+        return registryTimeout != null ? registryTimeout : globalTimeoutDuration;
     }
 
     private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(
