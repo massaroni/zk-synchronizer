@@ -1,11 +1,13 @@
 package com.mass.concurrent.sync.springaop;
 
 import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration.defaultTimeoutDuration;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.joda.time.Duration.standardMinutes;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.joda.time.Duration;
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
@@ -64,6 +66,32 @@ public class SynchronizerAdviceTest {
 
         factory.addAspect(spy.getAdviceSpy());
         final TestServiceInterface proxy = factory.getProxy();
+
+        final String actual = proxy.concat("abc", "def");
+
+        assertEquals("abcdef", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test
+    public void testAopProxy_AnnotationTimeoutInheritance() throws Throwable {
+        final InheritedAnnotationTimeoutTestService target = new InheritedAnnotationTimeoutTestService();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final PositiveDuration annotationTimeout = new PositiveDuration(new Duration(3L));
+        final PositiveDuration timeout1 = PositiveDuration.standardSeconds(1);
+        final PositiveDuration timeout4 = PositiveDuration.standardSeconds(4);
+        assertNotEquals(timeout1, timeout4);
+        assertNotEquals(timeout1, defaultTimeoutDuration);
+        assertNotEquals(timeout4, defaultTimeoutDuration);
+        assertNotEquals(annotationTimeout, defaultTimeoutDuration);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("test-lock-registry", "abc", annotationTimeout,
+                timeout1, timeout4);
+
+        factory.addAspect(spy.getAdviceSpy());
+        final AnnotationTimeoutTestServiceInterface proxy = factory.getProxy();
 
         final String actual = proxy.concat("abc", "def");
 
@@ -195,6 +223,19 @@ public class SynchronizerAdviceTest {
         public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2);
 
         public String unsynchronizedConcat(final String arg1, final String arg2);
+    }
+
+    public static interface AnnotationTimeoutTestServiceInterface {
+        public String concat(
+                @Synchronized(value = "test-lock-registry", timeoutDuration = 3, timeoutUnits = MILLISECONDS) final String arg1,
+                final String arg2);
+    }
+
+    public static class InheritedAnnotationTimeoutTestService implements AnnotationTimeoutTestServiceInterface {
+        @Override
+        public String concat(@Synchronized(value = "test-lock-registry") final String arg1, final String arg2) {
+            return arg1 + arg2;
+        }
     }
 
     public static class AnnotationTimeoutTestService implements TestServiceInterface {
