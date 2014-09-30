@@ -10,6 +10,7 @@ import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.SynchronizerLockKey;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
+import com.mass.core.PositiveDuration;
 import com.mass.core.Word;
 
 /**
@@ -23,20 +24,23 @@ import com.mass.core.Word;
 class InterProcessLockRegistry<K> implements LockRegistry<K> {
     private final InterProcessReentrantLockRegistry locks;
     private final SynchronizerLockKeyFactory<K> keyFactory;
+    private final PositiveDuration timeoutDuration;
 
     public InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final CuratorFramework zkClient,
-            final SynchronizerLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory, final PositiveDuration timeoutDuration) {
         this(rootZkPath, lockRegistryName, lockingPolicy, zkClient == null ? null : new InterProcessMutexFactory(
-                zkClient), keyFactory);
+                zkClient), keyFactory, timeoutDuration);
     }
 
     @VisibleForTesting
     InterProcessLockRegistry(final String rootZkPath, final Word lockRegistryName,
             final SynchronizerLockingPolicy lockingPolicy, final InterProcessMutexFactory mutexFactory,
-            final SynchronizerLockKeyFactory<K> keyFactory) {
+            final SynchronizerLockKeyFactory<K> keyFactory, final PositiveDuration timeoutDuration) {
         Preconditions.checkArgument(mutexFactory != null);
         Preconditions.checkArgument(lockingPolicy != null, "Undefined locking policy.");
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
+        Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
 
         switch (lockingPolicy) {
         case BEST_EFFORT:
@@ -49,8 +53,13 @@ class InterProcessLockRegistry<K> implements LockRegistry<K> {
             throw new IllegalArgumentException("Unexpected locking policy: " + lockingPolicy);
         }
 
-        Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
         this.keyFactory = keyFactory;
+        this.timeoutDuration = timeoutDuration;
+    }
+
+    @Override
+    public PositiveDuration getTimeoutDuration() {
+        return timeoutDuration;
     }
 
     @Override

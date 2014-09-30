@@ -22,6 +22,7 @@ import com.google.common.collect.Maps;
 import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
+import com.mass.core.PositiveDuration;
 import com.mass.lang.MethodParameterAnnotation;
 
 /**
@@ -74,11 +75,14 @@ public class SynchronizerAdvice {
         Preconditions.checkState(lock != null, "Can't get interprocess lock for registry %s, for key %s", lockName,
                 lockKey);
 
+        final PositiveDuration timeoutDuration = lockRegistry.getTimeoutDuration();
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration for registry %s.", lockName);
+
         if (log.isTraceEnabled()) {
             log.trace("Locking " + lockKey);
         }
 
-        if (!lock.tryLock(5, TimeUnit.SECONDS)) {
+        if (!lock.tryLock(timeoutDuration.getMillis(), TimeUnit.MILLISECONDS)) {
             final String msg = format("Timed out getting interprocess synchronizer lock for registry %s, for key %s",
                     lockName, lockKey);
             throw new TimeoutException(msg);

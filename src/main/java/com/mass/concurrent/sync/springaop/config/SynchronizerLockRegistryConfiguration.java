@@ -1,9 +1,11 @@
 package com.mass.concurrent.sync.springaop.config;
 
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.Seconds;
 
 import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
+import com.mass.core.PositiveDuration;
 import com.mass.core.Word;
 
 /**
@@ -16,6 +18,9 @@ public class SynchronizerLockRegistryConfiguration {
     private final Word name;
     private final SynchronizerLockKeyFactory<?> lockKeyFactory;
     private final SynchronizerLockingPolicy policyOverride;
+    private final PositiveDuration timeoutDuration;
+
+    public static final PositiveDuration defaultTimeoutDuration = PositiveDuration.standardSeconds(5);
 
     /**
      * @param name
@@ -39,12 +44,35 @@ public class SynchronizerLockRegistryConfiguration {
      */
     public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
             final SynchronizerLockKeyFactory<?> lockKeyFactory) {
+        this(name, policyOverride, lockKeyFactory, defaultTimeoutDuration);
+    }
+
+    public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
+            final SynchronizerLockKeyFactory<?> lockKeyFactory, final Seconds timeoutDuration) {
+        this(name, policyOverride, lockKeyFactory, PositiveDuration.seconds(timeoutDuration));
+    }
+
+    /**
+     * @param name
+     *            - corresponds to the name in the synchronized annotation: @Synchronized("myLockName")
+     * @param lockKeyFactory
+     *            - converts your proprietary lock-key model into a lock key that we can use with zookeeper. this is
+     *            required even if you're not using zookeeper.
+     * @param policyOverride
+     *            - (optional) overrides the default locking policy, for this lock registry.
+     * @param timeoutDuration
+     *            - a thread will give up and throw a timeout exception if it can't get the lock in this time window.
+     */
+    public SynchronizerLockRegistryConfiguration(final String name, final SynchronizerLockingPolicy policyOverride,
+            final SynchronizerLockKeyFactory<?> lockKeyFactory, final PositiveDuration timeoutDuration) {
         Preconditions.checkArgument(StringUtils.isNotBlank(name), "Undefined lock name.");
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
 
         this.name = new Word(name);
         this.policyOverride = policyOverride;
         this.lockKeyFactory = lockKeyFactory;
+        this.timeoutDuration = timeoutDuration;
     }
 
     public Word getName() {
@@ -57,6 +85,10 @@ public class SynchronizerLockRegistryConfiguration {
 
     public SynchronizerLockingPolicy getLockingPolicy() {
         return policyOverride;
+    }
+
+    public PositiveDuration getTimeoutDuration() {
+        return timeoutDuration;
     }
 
     @Override

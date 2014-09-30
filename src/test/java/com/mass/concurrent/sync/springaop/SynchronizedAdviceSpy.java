@@ -15,11 +15,13 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.mockito.Mockito;
 
+import com.google.common.base.Preconditions;
 import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.SynchronizerLockKey;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
+import com.mass.core.PositiveDuration;
 
 /**
  * This is for a one-shot disposable use case in unit tests.
@@ -29,14 +31,23 @@ import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
 public class SynchronizedAdviceSpy {
     private final ReentrantLock mockLock;
     private final SynchronizerAdvice adviceSpy;
+    private final PositiveDuration timeoutDuration;
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
+        this(lockName, expectedLockKey, SynchronizerLockRegistryConfiguration.defaultTimeoutDuration);
+    }
+
+    public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey,
+            final PositiveDuration timeoutDuration) {
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
+        this.timeoutDuration = timeoutDuration;
+
         final SynchronizerLockRegistryConfiguration lockDefinition = new SynchronizerLockRegistryConfiguration(
                 lockName, new NoOpLockKeyFactory());
 
         mockLock = mock(ReentrantLock.class);
         try {
-            when(mockLock.tryLock(eq(5L), eq(TimeUnit.SECONDS))).thenReturn(true);
+            when(mockLock.tryLock(eq(timeoutDuration.getMillis()), eq(TimeUnit.MILLISECONDS))).thenReturn(true);
         } catch (final InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -44,6 +55,7 @@ public class SynchronizedAdviceSpy {
         @SuppressWarnings("unchecked")
         final LockRegistry<Object> mockLockRegistry = mock(LockRegistry.class);
         when(mockLockRegistry.getLock(eq(expectedLockKey))).thenReturn(mockLock);
+        when(mockLockRegistry.getTimeoutDuration()).thenReturn(timeoutDuration);
 
         final LockRegistryFactory mockRegistryFactory = mock(LockRegistryFactory.class);
         when(mockRegistryFactory.newLockRegistry(eq(lockDefinition))).thenReturn(mockLockRegistry);
@@ -59,7 +71,7 @@ public class SynchronizedAdviceSpy {
 
     public void verifyAdviceWasCalled() throws Throwable {
         verify(adviceSpy, times(1)).synchronizeMethod(any(ProceedingJoinPoint.class));
-        verify(mockLock, times(1)).tryLock(eq(5L), eq(TimeUnit.SECONDS));
+        verify(mockLock, times(1)).tryLock(eq(timeoutDuration.getMillis()), eq(TimeUnit.MILLISECONDS));
         verify(mockLock, times(1)).unlock();
     }
 
