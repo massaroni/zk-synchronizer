@@ -149,9 +149,9 @@ Pure-XML Style, with all the available configuration, including optional propert
 
 There are 3 ways to configure timeouts, making a hierarchy of priorities:
 
-1) Global timeout duration on the SynchronizerConfiguration bean applies to all locks, by default
-2) Each lock registry can have its own timeout configuration, declared on its SynchronizerLockRegistryConfiguration bean, which overrides the global timeout configuration
-3) Each @Synchronized annotation can have its own timeout configuration, which overrides all other timeout configurations. ex: @Synchronized(value = "my-lock-name", timeoutDuration = 7, timeoutUnits = TimeUnit.SECONDS).  The annotation timeout on a concrete method overrides the annotation timeout on the interface method.
+1. Global timeout duration on the SynchronizerConfiguration bean applies to all locks, by default
+2. Each lock registry can have its own timeout configuration, declared on its SynchronizerLockRegistryConfiguration bean, which overrides the global timeout configuration
+3. Each @Synchronized annotation can have its own timeout configuration, which overrides all other timeout configurations. ex: @Synchronized(value = "my-lock-name", timeoutDuration = 7, timeoutUnits = TimeUnit.SECONDS).  The annotation timeout on a concrete method overrides the annotation timeout on the interface method.
 
 
 
