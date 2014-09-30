@@ -11,6 +11,7 @@ import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.SynchronizerLockKey;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.core.PositiveDuration;
+import com.sun.istack.internal.Nullable;
 
 /**
  * This is a fake interprocess lock registry that does all locking in memory. This will protect a single JVM, but it's
@@ -25,9 +26,9 @@ class LocalLockRegistry<K> implements LockRegistry<K> {
     private final SynchronizerLockKeyFactory<K> lockKeyFactory;
     private final PositiveDuration timeoutDuration;
 
-    public LocalLockRegistry(final SynchronizerLockKeyFactory<K> lockKeyFactory, final PositiveDuration timeoutDuration) {
+    public LocalLockRegistry(final SynchronizerLockKeyFactory<K> lockKeyFactory,
+            final @Nullable PositiveDuration timeoutDuration) {
         Preconditions.checkArgument(lockKeyFactory != null, "Undefined lock key factory.");
-        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
         this.lockKeyFactory = lockKeyFactory;
         this.timeoutDuration = timeoutDuration;
     }

@@ -39,7 +39,6 @@ class InterProcessLockRegistry<K> implements LockRegistry<K> {
             final SynchronizerLockKeyFactory<K> keyFactory, final PositiveDuration timeoutDuration) {
         Preconditions.checkArgument(mutexFactory != null);
         Preconditions.checkArgument(lockingPolicy != null, "Undefined locking policy.");
-        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration.");
         Preconditions.checkArgument(keyFactory != null, "Undefined key factory.");
 
         switch (lockingPolicy) {
