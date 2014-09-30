@@ -48,14 +48,33 @@ public final class SynchronizedMethodUtils {
             return targetAnnotation;
         }
 
-        if (equivalentSynchronizedAnnotations(targetAnnotation, ifaceAnnotation)) {
+        if (!equivalentSynchronizedAnnotations(targetAnnotation, ifaceAnnotation)) {
+            final String msg = String.format(
+                    "Mismatching @Synchronized annotations on interface and implementation methods: %s %s",
+                    ifaceMethod.toGenericString(), targetMethod.toGenericString());
+            throw new MismatchingSynchronizedAnnotationsException(msg);
+        }
+
+        if (hasTimeoutConfig(targetAnnotation)) {
             return targetAnnotation;
         }
 
-        final String msg = String.format(
-                "Mismatching @Synchronized annotations on interface and implementation methods: %s %s",
-                ifaceMethod.toGenericString(), targetMethod.toGenericString());
-        throw new MismatchingSynchronizedAnnotationsException(msg);
+        return ifaceAnnotation;
+    }
+
+    private static boolean hasTimeoutConfig(final MethodParameterAnnotation annotation) {
+        return hasTimeoutConfig(annotation.getAnnotation());
+    }
+
+    private static boolean hasTimeoutConfig(final Annotation annotation) {
+        Preconditions.checkArgument(annotation != null, "Undefined @Synchronized annotation.");
+        Preconditions.checkArgument(annotation instanceof Synchronized,
+                "Expected @Synchronized annotation, but was %s", annotation);
+        return hasTimeoutConfig(Synchronized.class.cast(annotation));
+    }
+
+    public static boolean hasTimeoutConfig(final Synchronized annotation) {
+        return annotation.timeoutDuration() > 0;
     }
 
     /**
