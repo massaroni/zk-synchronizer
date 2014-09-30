@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import com.mass.concurrent.sync.SynchronizerLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockingPolicy;
+import com.mass.core.PositiveDuration;
 
 class InterProcessLockRegistryFactory implements LockRegistryFactory {
     private final CuratorFramework zkClient;
@@ -33,6 +34,8 @@ class InterProcessLockRegistryFactory implements LockRegistryFactory {
         final SynchronizerLockKeyFactory keyFactory = definition.getLockKeyFactory();
         final SynchronizerLockingPolicy overridePolicy = definition.getLockingPolicy();
         final SynchronizerLockingPolicy lockingPolicy = overridePolicy != null ? overridePolicy : defaultLockingPolicy;
-        return new InterProcessLockRegistry(zkBasePath, definition.getName(), lockingPolicy, zkClient, keyFactory);
+        final PositiveDuration timeoutDuration = definition.getTimeoutDuration();
+        return new InterProcessLockRegistry(zkBasePath, definition.getName(), lockingPolicy, zkClient, keyFactory,
+                timeoutDuration);
     }
 }

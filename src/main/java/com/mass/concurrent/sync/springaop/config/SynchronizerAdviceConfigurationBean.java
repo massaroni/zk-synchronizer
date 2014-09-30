@@ -42,7 +42,7 @@ public class SynchronizerAdviceConfigurationBean implements ApplicationContextAw
             checkArgument(context != null, "Can't build advice: Undefined application context.");
 
             final LockRegistryFactory factory = registryFactory();
-            final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions, factory);
+            final SynchronizerAdvice advice = new SynchronizerAdvice(lockDefinitions, factory, configuration);
             return advice;
         }
     });
