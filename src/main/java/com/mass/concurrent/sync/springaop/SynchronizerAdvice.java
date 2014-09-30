@@ -6,7 +6,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.logging.Log;
@@ -20,6 +19,7 @@ import org.springframework.core.annotation.Order;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.mass.concurrent.LockRegistry;
 import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
@@ -96,7 +96,7 @@ public class SynchronizerAdvice {
         if (!lock.tryLock(timeoutDuration.getMillis(), TimeUnit.MILLISECONDS)) {
             final String msg = format("Timed out getting interprocess synchronizer lock for registry %s, for key %s",
                     lockName, lockKey);
-            throw new TimeoutException(msg);
+            throw new UncheckedTimeoutException(msg);
         }
 
         try {

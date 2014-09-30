@@ -4,11 +4,10 @@ import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguratio
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.lang.reflect.UndeclaredThrowableException;
-
 import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
+import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.mass.core.PositiveDuration;
 
 public class SynchronizerAdviceTest {
@@ -127,7 +126,7 @@ public class SynchronizerAdviceTest {
         spy.verifyAdviceWasCalled();
     }
 
-    @Test(expected = UndeclaredThrowableException.class)
+    @Test(expected = UncheckedTimeoutException.class)
     public void testAopProxy_UseRegistrtyTimeoutDuration_BreakExpectations() throws Throwable {
         final AnnotatedTestSubclass target = new AnnotatedTestSubclass();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
