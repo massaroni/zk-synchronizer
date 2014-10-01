@@ -33,6 +33,11 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allJava
 }
 
+task testJar(type: Jar) {
+    classifier = 'test'
+    from sourceSets.test.output
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -40,6 +45,10 @@ publishing {
             
             artifact sourceJar {
                 classifier "sources"
+            }
+            
+            artifact testJar {
+                classifier "test"
             }
         }
     }
