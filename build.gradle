@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-version = '2.2.1'
+version = '2.2.2'
 group = 'com.mass'
 
 repositories { mavenCentral() }
@@ -16,7 +16,7 @@ dependencies {
 	compile 'org.apache.curator:curator-recipes:2.4.0'
 	// end curator
 
-    compile 'com.google.guava:guava:14.0.1'
+    compile 'com.google.guava:guava:18.0'
 	compile 'joda-time:joda-time:2.3'
 	compile 'org.springframework:spring-context:3.2.8.RELEASE'
 	compile 'org.springframework:spring-core:3.2.8.RELEASE'

@@ -23,8 +23,8 @@ public final class SynchronizedMethodUtils {
     }
 
     public static MethodParameterAnnotation getSynchronizedAnnotation(final ProceedingJoinPoint joinPoint) {
-        final Method ifaceMethod = ReflectionUtils.getSignatureMethod(joinPoint);
-        final Method targetMethod = ReflectionUtils.getTargetMethod(joinPoint);
+        final Method ifaceMethod = ReflectionUtils.getSynchronizedSignatureMethod(joinPoint);
+        final Method targetMethod = ReflectionUtils.getSynchronizedTargetMethod(joinPoint);
 
         final MethodParameterAnnotation ifaceAnnotation = getSynchronizedAnnotation(ifaceMethod);
 

@@ -1,5 +1,7 @@
 package com.mass.util;
 
+import static com.google.common.collect.FluentIterable.from;
+import static com.google.common.collect.Iterables.getOnlyElement;
 import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 
 import java.lang.annotation.Annotation;
@@ -17,9 +19,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import com.mass.concurrent.sync.springaop.Synchronized;
 import com.mass.lang.MethodParameterAnnotation;
 
 public final class ReflectionUtils {
+
+    private static final HasParameterAnnotationPredicate hasSynchronizedParameter = new HasParameterAnnotationPredicate(
+            Synchronized.class);
+
     private ReflectionUtils() {
     }
 
@@ -212,6 +219,52 @@ public final class ReflectionUtils {
         }
 
         return false;
+    }
+
+    public static Method getSynchronizedSignatureMethod(final ProceedingJoinPoint joinPoint) {
+        final List<Method> methods = getMethodsForSignature(joinPoint);
+        Preconditions.checkArgument(isNotEmpty(methods), "No methods matching join point.");
+
+        if (methods.size() == 1) {
+            return getOnlyElement(methods);
+        }
+
+        final List<Method> synchronizedMethods = from(methods).filter(hasSynchronizedParameter).toList();
+        Preconditions.checkArgument(isNotEmpty(synchronizedMethods), "No @Synchronized methods matching join point.");
+        Preconditions.checkArgument(synchronizedMethods.size() == 1,
+                "Too many methods matching join point signature. Can't find target method.");
+
+        return getOnlyElement(synchronizedMethods);
+    }
+
+    /**
+     * Get the concrete Method of the proxied object.
+     * 
+     * @param joinPoint
+     * @return
+     */
+    public static Method getSynchronizedTargetMethod(final ProceedingJoinPoint joinPoint) {
+        Preconditions.checkArgument(joinPoint != null, "Undefined join point.");
+
+        final Object proxyTarget = joinPoint.getTarget();
+        Preconditions.checkArgument(proxyTarget != null, "Undefined proxy target in join point.");
+        final Class<?> targetClass = proxyTarget.getClass();
+
+        final Method ifaceMethod = getSynchronizedSignatureMethod(joinPoint);
+
+        if (targetClass.equals(ifaceMethod.getDeclaringClass())) {
+            return ifaceMethod;
+        }
+
+        try {
+            final Method targetMethod = targetClass.getMethod(ifaceMethod.getName(), ifaceMethod.getParameterTypes());
+            Preconditions.checkNotNull(targetMethod);
+            return targetMethod;
+        } catch (final SecurityException e) {
+            throw new RuntimeException(e);
+        } catch (final NoSuchMethodException e) {
+            throw new RuntimeException("Can't find method for join point.", e);
+        }
     }
 
     /**
