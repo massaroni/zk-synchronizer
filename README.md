@@ -70,12 +70,14 @@ public class ServiceWithCriticalSection {
 	}
 	
 	/**
-	 * This is synchronized with writeResource().  It derives the lock key with a custom 'key' SpEL expression,
-	 * in the @Synchronized annotation.
+	 * This is synchronized with writeResource().
+	 * It derives the lock key with a custom 'key' Spring Expression Language (SpEL) expression,
+	 *  on the @Synchronized annotation.
 	 *
 	 * @param key - use key.owner.id as the lock key for this method.
 	 */
-	public SomeResource readResoure(@Synchronized(value = "resourcePool", key = "owner.id") PartitionKey key) {
+	public SomeResource readResoure(
+		@Synchronized(value = "resourcePool", key = "owner.id") PartitionKey key) {
 	 ...
 	}
 }
