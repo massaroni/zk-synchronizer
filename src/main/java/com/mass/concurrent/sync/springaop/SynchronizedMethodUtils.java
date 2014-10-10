@@ -1,6 +1,7 @@
 package com.mass.concurrent.sync.springaop;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -10,6 +11,11 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.joda.time.Duration;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
@@ -20,6 +26,22 @@ import com.mass.util.ReflectionUtils;
 
 public final class SynchronizedMethodUtils {
     private SynchronizedMethodUtils() {
+    }
+
+    public static Object getLockKey(final Object synchronizedArgument, final Synchronized annotation) {
+        Preconditions.checkArgument(synchronizedArgument != null, "Undefined lock key argument.");
+        Preconditions.checkArgument(annotation != null);
+
+        final String keyExpression = annotation.key();
+        if (isBlank(keyExpression)) {
+            return synchronizedArgument;
+        }
+
+        final ExpressionParser parser = new SpelExpressionParser();
+        final Expression exp = parser.parseExpression(keyExpression);
+        final EvaluationContext context = new StandardEvaluationContext(synchronizedArgument);
+
+        return exp.getValue(context);
     }
 
     public static MethodParameterAnnotation getSynchronizedAnnotation(final ProceedingJoinPoint joinPoint) {
