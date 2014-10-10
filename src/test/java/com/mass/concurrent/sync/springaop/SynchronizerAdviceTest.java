@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 
 import com.google.common.util.concurrent.UncheckedTimeoutException;
+import com.mass.concurrent.sync.springaop.SynchronizedMethodUtilsTest.ComplexKey;
+import com.mass.concurrent.sync.springaop.SynchronizedMethodUtilsTest.NestedComplexKey;
 import com.mass.core.PositiveDuration;
 
 public class SynchronizerAdviceTest {
@@ -47,6 +49,44 @@ public class SynchronizerAdviceTest {
         assertEquals("unsynchronized: abcdef", actual);
 
         spy.verifyAdviceWasNotCalled();
+    }
+
+    @Test
+    public void testAopProxy_CustomKeyExpression_Shallow() throws Throwable {
+        final SynchronizedMethodUtilsTest.DerivedKeyTestService target = new SynchronizedMethodUtilsTest.DerivedKeyTestService();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("echo-lock", "shallow key");
+
+        factory.addAspect(spy.getAdviceSpy());
+        final SynchronizedMethodUtilsTest.DerivedKeyTestService proxy = factory.getProxy();
+
+        final ComplexKey complexKey = new ComplexKey("shallow key", new NestedComplexKey("deep key"));
+
+        final String actual = proxy.shallow(complexKey, "echome");
+
+        assertEquals("echome", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test
+    public void testAopProxy_CustomKeyExpression_Deep() throws Throwable {
+        final SynchronizedMethodUtilsTest.DerivedKeyTestService target = new SynchronizedMethodUtilsTest.DerivedKeyTestService();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("echo-lock", "deep key");
+
+        factory.addAspect(spy.getAdviceSpy());
+        final SynchronizedMethodUtilsTest.DerivedKeyTestService proxy = factory.getProxy();
+
+        final ComplexKey complexKey = new ComplexKey("shallow key", new NestedComplexKey("deep key"));
+
+        final String actual = proxy.deep(complexKey, "echome");
+
+        assertEquals("echome", actual);
+
+        spy.verifyAdviceWasCalled();
     }
 
     @Test

@@ -27,4 +27,12 @@ public @interface Synchronized {
     long timeoutDuration() default -1;
 
     TimeUnit timeoutUnits() default TimeUnit.DAYS;
+
+    /**
+     * Spring expression language that evaluates to the target lock key. The synchronized method argument is the root
+     * object in the evaluation context.
+     * 
+     * @return
+     */
+    String key() default "";
 }
