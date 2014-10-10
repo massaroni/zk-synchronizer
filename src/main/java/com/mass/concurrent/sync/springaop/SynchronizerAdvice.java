@@ -75,13 +75,15 @@ public class SynchronizerAdvice {
         Preconditions.checkArgument(args.length > annotation.getParameterIndex(),
                 "Arguments array doesn't match method signature. @Synchronized parameter index out of bounds.");
 
-        final Object lockKey = args[annotation.getParameterIndex()];
+        final Object lockKeyArg = args[annotation.getParameterIndex()];
 
         final Synchronized sync = Synchronized.class.cast(annotation.getAnnotation());
         final String lockName = sync.value();
 
         final LockRegistry<Object> lockRegistry = lockRegistries.get(lockName);
         Preconditions.checkArgument(lockRegistry != null, "No interprocess lock registry named %s", lockName);
+
+        final Object lockKey = SynchronizedMethodUtils.getLockKey(lockKeyArg, sync);
 
         final ReentrantLock lock = lockRegistry.getLock(lockKey);
         Preconditions.checkState(lock != null, "Can't get interprocess lock for registry %s, for key %s", lockName,
