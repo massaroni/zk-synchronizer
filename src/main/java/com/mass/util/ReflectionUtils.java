@@ -1,9 +1,5 @@
 package com.mass.util;
 
-import static com.google.common.collect.FluentIterable.from;
-import static com.google.common.collect.Iterables.getOnlyElement;
-import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -11,6 +7,7 @@ import java.util.List;
 import org.aspectj.lang.JoinPoint.StaticPart;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.TargetSource;
 import org.springframework.aop.framework.Advised;
 
@@ -177,27 +174,6 @@ public final class ReflectionUtils {
         return false;
     }
 
-    public static List<Method> getMethodsForSignature(final ProceedingJoinPoint joinPoint) {
-        final Signature signature = tryGetStaticSignature(joinPoint);
-
-        final int joinPointArgCount = joinPoint.getArgs().length;
-
-        final Class<?> declaringClass = signature.getDeclaringType();
-        final Method[] methods = declaringClass.getMethods();
-        Preconditions.checkNotNull(methods);
-        final String methodName = signature.getName();
-
-        final List<Method> matches = Lists.newArrayList();
-
-        for (final Method method : methods) {
-            if (method.getName().equals(methodName) && method.getParameterTypes().length == joinPointArgCount) {
-                matches.add(method);
-            }
-        }
-
-        return matches;
-    }
-
     public static boolean hasParameterOfType(final Class<?> targetParamClass, final Method method) {
         Preconditions.checkArgument(targetParamClass != null, "Undefined parameter class.");
         Preconditions.checkArgument(method != null, "Undefined method.");
@@ -222,19 +198,20 @@ public final class ReflectionUtils {
     }
 
     public static Method getSynchronizedSignatureMethod(final ProceedingJoinPoint joinPoint) {
-        final List<Method> methods = getMethodsForSignature(joinPoint);
-        Preconditions.checkArgument(isNotEmpty(methods), "No methods matching join point.");
+        final Method signatureMethod = getSignatureMethod(joinPoint);
+        return hasSynchronizedParameter.apply(signatureMethod) ? signatureMethod : null;
+    }
 
-        if (methods.size() == 1) {
-            return getOnlyElement(methods);
-        }
+    private static MethodSignature getMethodSignature(final ProceedingJoinPoint joinPoint) {
+        Preconditions.checkArgument(joinPoint != null, "Undefined join point.");
 
-        final List<Method> synchronizedMethods = from(methods).filter(hasSynchronizedParameter).toList();
-        Preconditions.checkArgument(isNotEmpty(synchronizedMethods), "No @Synchronized methods matching join point.");
-        Preconditions.checkArgument(synchronizedMethods.size() == 1,
-                "Too many methods matching join point signature. Can't find target method.");
+        final Signature signature = joinPoint.getSignature();
+        Preconditions.checkArgument(signature != null, "Undefined join point signature.");
 
-        return getOnlyElement(synchronizedMethods);
+        Preconditions.checkArgument(MethodSignature.class.isAssignableFrom(signature.getClass()),
+                "Expected MethodSignature, but was %s", signature);
+
+        return MethodSignature.class.cast(signature);
     }
 
     /**
@@ -246,25 +223,42 @@ public final class ReflectionUtils {
     public static Method getSynchronizedTargetMethod(final ProceedingJoinPoint joinPoint) {
         Preconditions.checkArgument(joinPoint != null, "Undefined join point.");
 
+        final Signature signature = joinPoint.getSignature();
+        Preconditions.checkArgument(signature != null, "Undefined join point signature.");
+
         final Object proxyTarget = joinPoint.getTarget();
         Preconditions.checkArgument(proxyTarget != null, "Undefined proxy target in join point.");
         final Class<?> targetClass = proxyTarget.getClass();
 
-        final Method ifaceMethod = getSynchronizedSignatureMethod(joinPoint);
+        Preconditions.checkArgument(MethodSignature.class.isAssignableFrom(signature.getClass()),
+                "Expected MethodSignature, but was %s", signature);
 
-        if (targetClass.equals(ifaceMethod.getDeclaringClass())) {
-            return ifaceMethod;
+        final MethodSignature methodSig = MethodSignature.class.cast(signature);
+        final Method superMethod = methodSig.getMethod();
+
+        if (targetClass.equals(superMethod.getDeclaringClass())) {
+            return superMethod;
         }
 
-        try {
-            final Method targetMethod = targetClass.getMethod(ifaceMethod.getName(), ifaceMethod.getParameterTypes());
-            Preconditions.checkNotNull(targetMethod);
-            return targetMethod;
-        } catch (final SecurityException e) {
-            throw new RuntimeException(e);
-        } catch (final NoSuchMethodException e) {
-            throw new RuntimeException("Can't find method for join point.", e);
+        final String name = superMethod.getName();
+        final Method[] targetClassMethods = targetClass.getMethods();
+
+        Method override = null;
+        for (final Method method : targetClassMethods) {
+            if (!name.equals(method.getName())) {
+                continue;
+            }
+
+            if (!hasSynchronizedParameter.apply(method)) {
+                continue;
+            }
+
+            Preconditions.checkArgument(override == null, "More than one @Synchronized method matches signature: %s",
+                    signature);
+            override = method;
         }
+
+        return override;
     }
 
     /**
@@ -275,16 +269,8 @@ public final class ReflectionUtils {
      * @return
      */
     public static Method getSignatureMethod(final ProceedingJoinPoint joinPoint) {
-        final List<Method> methods = getMethodsForSignature(joinPoint);
-
-        Preconditions.checkArgument(isNotEmpty(methods), "No methods matching join point.");
-        Preconditions.checkArgument(methods.size() == 1,
-                "Too many methods matching join point signature. Can't find target method.");
-
-        final Method method = methods.get(0);
-        Preconditions.checkArgument(method != null, "Missing signature method.");
-
-        return method;
+        final MethodSignature signature = getMethodSignature(joinPoint);
+        return signature.getMethod();
     }
 
     /**
