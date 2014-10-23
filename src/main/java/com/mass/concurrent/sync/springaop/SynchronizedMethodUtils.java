@@ -48,27 +48,29 @@ public final class SynchronizedMethodUtils {
         final Method ifaceMethod = ReflectionUtils.getSynchronizedSignatureMethod(joinPoint);
         final Method targetMethod = ReflectionUtils.getSynchronizedTargetMethod(joinPoint);
 
+        if (ifaceMethod == null) {
+            Preconditions.checkArgument(targetMethod != null,
+                    "No @Synchronized annotation on interface or override method.");
+            return getSynchronizedAnnotation(targetMethod);
+        }
+
+        if (targetMethod == null) {
+            Preconditions.checkArgument(ifaceMethod != null,
+                    "No @Synchronized annotation on interface or override method.");
+            return getSynchronizedAnnotation(ifaceMethod);
+        }
+
         final MethodParameterAnnotation ifaceAnnotation = getSynchronizedAnnotation(ifaceMethod);
+        Preconditions.checkState(ifaceAnnotation != null, "Can't find @Synchronized annotation on iface method: %s",
+                ifaceMethod);
 
         if (ifaceMethod.equals(targetMethod)) {
-            Preconditions.checkState(ifaceAnnotation != null, "No @Synchronized annotation on any parameter: %s",
-                    ifaceMethod.toGenericString());
             return ifaceAnnotation;
         }
 
         final MethodParameterAnnotation targetAnnotation = getSynchronizedAnnotation(targetMethod);
-
-        if (targetAnnotation == null) {
-            Preconditions.checkState(ifaceAnnotation != null, "No @Synchronized annotation on any parameter: %s",
-                    ifaceMethod.toGenericString());
-            return ifaceAnnotation;
-        }
-
-        if (ifaceAnnotation == null) {
-            Preconditions.checkState(targetAnnotation != null, "No @Synchronized annotation on any parameter: %s",
-                    targetMethod.toGenericString());
-            return targetAnnotation;
-        }
+        Preconditions.checkState(targetAnnotation != null, "Can't find @Synchronized annotation on target method: %s",
+                targetMethod);
 
         if (!equivalentSynchronizedAnnotations(targetAnnotation, ifaceAnnotation)) {
             final String msg = String.format(
