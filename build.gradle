@@ -4,16 +4,16 @@ apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-version = '2.4.0'
+version = '3.0.0'
 group = 'com.mass'
 
 repositories { mavenCentral() }
 
 dependencies {
 	// curator
-	compile 'org.apache.curator:curator-client:2.4.0'
-	compile 'org.apache.curator:curator-framework:2.4.0'
-	compile 'org.apache.curator:curator-recipes:2.4.0'
+	compile 'org.apache.curator:curator-client:2.8.0'
+	compile 'org.apache.curator:curator-framework:2.8.0'
+	compile 'org.apache.curator:curator-recipes:2.8.0'
 	// end curator
 
     compile 'com.google.guava:guava:18.0'
