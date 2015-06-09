@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
-version = '2.3.1'
+version = '2.4.0'
 group = 'com.mass'
 
 repositories { mavenCentral() }
@@ -62,7 +62,7 @@ publishing {
 
 test {
 	systemProperties = System.properties
-	testReport = true;
+	reports.html.enabled = true;
 	testLogging {
 		showStandardStreams = true;
 		exceptionFormat "full" //default is short
