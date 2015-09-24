@@ -18,4 +18,14 @@ public class StringLockKeyFactory implements SynchronizerLockKeyFactory<String> 
         final String zkSafe = Base64.encodeURLSafe(key);
         return new SynchronizerLockKey(zkSafe);
     }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        return obj != null && obj.getClass().equals(getClass());
+    }
 }

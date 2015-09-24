@@ -96,6 +96,56 @@ public class SynchronizerLockRegistryConfiguration {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (lockKeyFactory == null ? 0 : lockKeyFactory.hashCode());
+        result = prime * result + (name == null ? 0 : name.hashCode());
+        result = prime * result + (policyOverride == null ? 0 : policyOverride.hashCode());
+        result = prime * result + (timeoutDuration == null ? 0 : timeoutDuration.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SynchronizerLockRegistryConfiguration other = (SynchronizerLockRegistryConfiguration) obj;
+        if (lockKeyFactory == null) {
+            if (other.lockKeyFactory != null) {
+                return false;
+            }
+        } else if (!lockKeyFactory.equals(other.lockKeyFactory)) {
+            return false;
+        }
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        if (policyOverride != other.policyOverride) {
+            return false;
+        }
+        if (timeoutDuration == null) {
+            if (other.timeoutDuration != null) {
+                return false;
+            }
+        } else if (!timeoutDuration.equals(other.timeoutDuration)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "SynchronizerLockRegistryConfiguration [name=" + name + ", lockKeyFactory=" + lockKeyFactory
                 + ", policyOverride=" + policyOverride + "]";
