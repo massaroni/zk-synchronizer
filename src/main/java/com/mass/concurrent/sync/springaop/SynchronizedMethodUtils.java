@@ -44,6 +44,25 @@ public final class SynchronizedMethodUtils {
         return exp.getValue(context);
     }
 
+    public static Annotation getMethodLevelSynchronizedAnnotation(final ProceedingJoinPoint joinPoint) {
+        final Method ifaceMethod = ReflectionUtils.getSignatureMethod(joinPoint);
+        final Method targetMethod = ReflectionUtils.getTargetMethod(joinPoint);
+
+        if (targetMethod != null) {
+            final Annotation annotation = getMethodLevelSynchronizedAnnotation(targetMethod);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+
+        Preconditions.checkArgument(ifaceMethod != null, "Can't read methods in join point: %s", joinPoint);
+        return getMethodLevelSynchronizedAnnotation(ifaceMethod);
+    }
+
+    public static Annotation getMethodLevelSynchronizedAnnotation(final Method method) {
+        return method.getAnnotation(Synchronized.class);
+    }
+
     public static MethodParameterAnnotation getSynchronizedAnnotation(final ProceedingJoinPoint joinPoint) {
         final Method ifaceMethod = ReflectionUtils.getSynchronizedSignatureMethod(joinPoint);
         final Method targetMethod = ReflectionUtils.getSynchronizedTargetMethod(joinPoint);
