@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * @author kmassaroni
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.PARAMETER })
+@Target({ ElementType.PARAMETER, ElementType.METHOD })
 public @interface Synchronized {
 
     /**

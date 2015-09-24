@@ -52,6 +52,23 @@ public class SynchronizerAdviceTest {
     }
 
     @Test
+    public void testAopProxy_Keyless_InterfaceTarget_Proxied() throws Throwable {
+        final TestService target = new TestService();
+        final AspectJProxyFactory factory = new AspectJProxyFactory(target);
+
+        final SynchronizedAdviceSpy spy = new SynchronizedAdviceSpy("keyless");
+
+        factory.addAspect(spy.getAdviceSpy());
+        final TestServiceInterface proxy = factory.getProxy();
+
+        final String actual = proxy.concat("abc", "def", "ghi");
+
+        assertEquals("abcdefghi", actual);
+
+        spy.verifyAdviceWasCalled();
+    }
+
+    @Test
     public void testAopProxy_CustomKeyExpression_Shallow() throws Throwable {
         final SynchronizedMethodUtilsTest.DerivedKeyTestService target = new SynchronizedMethodUtilsTest.DerivedKeyTestService();
         final AspectJProxyFactory factory = new AspectJProxyFactory(target);
@@ -259,8 +276,16 @@ public class SynchronizerAdviceTest {
         proxy.concat("abc", "def");
     }
 
+    @Test
+    public void testSynchronizerConfigEquality() {
+        assertEquals(SynchronizerAdvice.keylessLocksConfiguration(), SynchronizerAdvice.keylessLocksConfiguration());
+    }
+
     public static interface TestServiceInterface {
         public String concat(@Synchronized("test-lock-registry") final String arg1, final String arg2);
+
+        @Synchronized("keyless")
+        public String concat(String arg1, String arg2, String arg3);
 
         public String unsynchronizedConcat(final String arg1, final String arg2);
     }
@@ -287,6 +312,12 @@ public class SynchronizerAdviceTest {
         }
 
         @Override
+        @Synchronized(value = "keyless", timeoutDuration = 8, timeoutUnits = MINUTES)
+        public String concat(final String arg1, final String arg2, final String arg3) {
+            return arg1 + arg2 + arg3;
+        }
+
+        @Override
         public String unsynchronizedConcat(final String arg1, final String arg2) {
             return "unsynchronized: " + arg1 + arg2;
         }
@@ -299,6 +330,12 @@ public class SynchronizerAdviceTest {
         }
 
         @Override
+        @Synchronized("keyless")
+        public String concat(final String arg1, final String arg2, final String arg3) {
+            return arg1 + arg2 + arg3;
+        }
+
+        @Override
         public String unsynchronizedConcat(final String arg1, final String arg2) {
             return "unsynchronized: " + arg1 + arg2;
         }
@@ -308,6 +345,11 @@ public class SynchronizerAdviceTest {
         @Override
         public String concat(final String arg1, final String arg2) {
             return arg1 + arg2;
+        }
+
+        @Override
+        public String concat(final String arg1, final String arg2, final String arg3) {
+            return arg1 + arg2 + arg3;
         }
 
         @Override

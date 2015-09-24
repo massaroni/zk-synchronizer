@@ -3,8 +3,8 @@ package com.mass.concurrent.sync.springaop;
 import static com.mass.concurrent.sync.springaop.SynchronizedMethodUtils.toTimeoutDuration;
 import static com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration.defaultTimeoutDuration;
 import static java.lang.String.format;
-import static org.springframework.util.CollectionUtils.isEmpty;
 
+import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.mass.concurrent.LockRegistry;
+import com.mass.concurrent.sync.keyfactories.StringLockKeyFactory;
 import com.mass.concurrent.sync.springaop.config.SynchronizerConfiguration;
 import com.mass.concurrent.sync.springaop.config.SynchronizerLockRegistryConfiguration;
 import com.mass.concurrent.sync.zookeeper.LockRegistryFactory;
@@ -38,9 +39,11 @@ import com.mass.lang.MethodParameterAnnotation;
 @Order(Integer.MIN_VALUE)
 public class SynchronizerAdvice {
     private static final Log log = LogFactory.getLog(SynchronizerAdvice.class);
+    private static String METHOD_KEYLESS_LOCK_REGISTRY_NAME = "SYNCHRONIZER_KEYLESS_LOCKS";
 
     private final ImmutableMap<String, LockRegistry<Object>> lockRegistries;
     private final PositiveDuration globalTimeoutDuration;
+    private final LockRegistry<Object> keylessLocks;
 
     public SynchronizerAdvice(final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         this(locks, factory, null);
@@ -57,15 +60,48 @@ public class SynchronizerAdvice {
         log.info("new SynchronizerAdvice");
 
         if (locks == null) {
-            lockRegistries = null;
+            lockRegistries = buildRegistries(new SynchronizerLockRegistryConfiguration[] {}, factory);
         } else {
             lockRegistries = buildRegistries(locks, factory);
+        }
+
+        keylessLocks = lockRegistries.get(METHOD_KEYLESS_LOCK_REGISTRY_NAME);
+        Preconditions.checkState(keylessLocks != null, "Can't setup keyless lock registry.");
+    }
+
+    @Around("execution(@com.mass.concurrent.sync.springaop.Synchronized * *(..))")
+    public Object synchronizeMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
+        final Annotation annotation = SynchronizedMethodUtils.getMethodLevelSynchronizedAnnotation(joinPoint);
+        Preconditions.checkArgument(annotation != null, "Can't find @Synchronized annotation in %s", joinPoint);
+        final Synchronized sync = Synchronized.class.cast(annotation);
+        final String lockName = sync.value();
+
+        final ReentrantLock lock = keylessLocks.getLock(lockName);
+        Preconditions.checkState(lock != null, "Can't get interprocess lock for keyless registry %s", lockName);
+
+        final PositiveDuration timeoutDuration = getTimeoutDuration(sync, keylessLocks);
+        Preconditions.checkArgument(timeoutDuration != null, "Undefined timeout duration for keyless lock %s.",
+                lockName);
+
+        if (log.isTraceEnabled()) {
+            log.trace("Locking keyless " + lockName);
+        }
+
+        if (!lock.tryLock(timeoutDuration.getMillis(), TimeUnit.MILLISECONDS)) {
+            final String msg = format("Timed out getting interprocess synchronizer lock for keyless lock %s", lockName);
+            throw new UncheckedTimeoutException(msg);
+        }
+
+        try {
+            return joinPoint.proceed();
+        } finally {
+            lock.unlock();
         }
     }
 
     @Around("execution(* *(.., @com.mass.concurrent.sync.springaop.Synchronized (*), ..))")
-    public Object synchronizeMethod(final ProceedingJoinPoint joinPoint) throws Throwable {
-        Preconditions.checkState(!isEmpty(lockRegistries), "No interprocess lock registries available.");
+    public Object synchronizeMethodArg(final ProceedingJoinPoint joinPoint) throws Throwable {
+        Preconditions.checkState(lockRegistries.size() > 1, "No interprocess lock registries available.");
 
         final MethodParameterAnnotation annotation = SynchronizedMethodUtils.getSynchronizedAnnotation(joinPoint);
         Preconditions.checkArgument(annotation != null, "Can't find @Synchronized parameter.");
@@ -120,12 +156,25 @@ public class SynchronizerAdvice {
         return registryTimeout != null ? registryTimeout : globalTimeoutDuration;
     }
 
+    static SynchronizerLockRegistryConfiguration keylessLocksConfiguration() {
+        return new SynchronizerLockRegistryConfiguration(METHOD_KEYLESS_LOCK_REGISTRY_NAME, new StringLockKeyFactory());
+    }
+
+    private static LockRegistry<Object> newKeylessLockRegistry(final LockRegistryFactory factory) {
+        final SynchronizerLockRegistryConfiguration keylessRegistryConfig = keylessLocksConfiguration();
+        return factory.newLockRegistry(keylessRegistryConfig);
+    }
+
     private static ImmutableMap<String, LockRegistry<Object>> buildRegistries(
             final SynchronizerLockRegistryConfiguration[] locks, final LockRegistryFactory factory) {
         Preconditions.checkArgument(locks != null, "Undefined lock definitions.");
         Preconditions.checkArgument(factory != null, "Undefined lock registry factory.");
 
         final Map<String, LockRegistry<Object>> registries = Maps.newHashMap();
+
+        final LockRegistry<Object> keylessLocks = newKeylessLockRegistry(factory);
+        Preconditions.checkState(keylessLocks != null, "Can't make keyless lock registry.");
+        registries.put(METHOD_KEYLESS_LOCK_REGISTRY_NAME, keylessLocks);
 
         for (final SynchronizerLockRegistryConfiguration lockDefinition : locks) {
             final String name = lockDefinition.getName().getValue();

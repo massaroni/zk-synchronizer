@@ -35,6 +35,11 @@ public class SynchronizedAdviceSpy {
     private final ReentrantLock mockLock;
     private final SynchronizerAdvice adviceSpy;
     private final PositiveDuration expectedTimeoutDuration;
+    private final boolean keyless;
+
+    public SynchronizedAdviceSpy(final String keylessLockName) {
+        this("unexpected", keylessLockName, defaultTimeoutDuration, defaultTimeoutDuration, null, true);
+    }
 
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey) {
         this(lockName, expectedLockKey, defaultTimeoutDuration, defaultTimeoutDuration, null);
@@ -43,8 +48,15 @@ public class SynchronizedAdviceSpy {
     public SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey,
             final PositiveDuration expectedTimeout, final PositiveDuration globalTimeout,
             final PositiveDuration registryTimeout) {
+        this(lockName, expectedLockKey, expectedTimeout, globalTimeout, registryTimeout, false);
+    }
+
+    private SynchronizedAdviceSpy(final String lockName, final Object expectedLockKey,
+            final PositiveDuration expectedTimeout, final PositiveDuration globalTimeout,
+            final PositiveDuration registryTimeout, final boolean keyless) {
         Preconditions.checkArgument(expectedTimeout != null, "Undefined expected timeout duration.");
         Preconditions.checkArgument(globalTimeout != null, "Undefined global timeout duration.");
+        this.keyless = keyless;
 
         expectedTimeoutDuration = expectedTimeout;
 
@@ -65,6 +77,8 @@ public class SynchronizedAdviceSpy {
 
         final LockRegistryFactory mockRegistryFactory = mock(LockRegistryFactory.class);
         when(mockRegistryFactory.newLockRegistry(eq(lockDefinition))).thenReturn(mockLockRegistry);
+        when(mockRegistryFactory.newLockRegistry(eq(SynchronizerAdvice.keylessLocksConfiguration()))).thenReturn(
+                mockLockRegistry);
 
         final SynchronizerLockRegistryConfiguration[] lockDefinitions = { lockDefinition };
 
@@ -79,13 +93,19 @@ public class SynchronizedAdviceSpy {
     }
 
     public void verifyAdviceWasCalled() throws Throwable {
-        verify(adviceSpy, times(1)).synchronizeMethod(any(ProceedingJoinPoint.class));
+        if (keyless) {
+            verify(adviceSpy, times(1)).synchronizeMethod(any(ProceedingJoinPoint.class));
+        } else {
+            verify(adviceSpy, times(1)).synchronizeMethodArg(any(ProceedingJoinPoint.class));
+        }
+
         verify(mockLock, times(1)).tryLock(eq(expectedTimeoutDuration.getMillis()), eq(TimeUnit.MILLISECONDS));
         verify(mockLock, times(1)).unlock();
     }
 
     public void verifyAdviceWasNotCalled() throws Throwable {
         verify(adviceSpy, never()).synchronizeMethod(any(ProceedingJoinPoint.class));
+        verify(adviceSpy, never()).synchronizeMethodArg(any(ProceedingJoinPoint.class));
         verify(mockLock, never()).tryLock(anyLong(), any(TimeUnit.class));
         verify(mockLock, never()).unlock();
     }
