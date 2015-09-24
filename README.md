@@ -80,6 +80,25 @@ public class ServiceWithCriticalSection {
 		@Synchronized(value = "resourcePool", key = "owner.id") PartitionKey key) {
 	 ...
 	}
+
+	/**
+	 * All calls to this method are synchronized, because no parameter is used as a lock key.
+	 */
+	@Synchronized("someUniqueThing")
+	public SomeResource readSingletonResoure() {
+	 ...
+	}
+
+	/**
+	 * All calls to this method are synchronized, because no parameter is used as a lock key,
+	 * and all these calls are also synchronized with all calls to readSingletonResource(), above,
+	 * because they have the same lock name: "someUniqueThing".
+	 */
+	@Synchronized("someUniqueThing")
+	public void writeSingletonResoure(SomeResource replacement) {
+	 ...
+	}
+
 }
 
 @Service
